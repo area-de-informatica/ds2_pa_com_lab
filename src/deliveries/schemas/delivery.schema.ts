@@ -11,28 +11,16 @@ import { Document } from 'mongoose';
 
 export class Delivery extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    delivery_date: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    hour: string;
 
     @Prop()
-    status: string;
+    note: string;
 
     @Prop()
-    createdAt: Date;
-
-    @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    comment: string;   
 }
 
-export const UserSchema = SchemaFactory.createForClass(Delivery);
+export const DeliverySchema = SchemaFactory.createForClass(Delivery);

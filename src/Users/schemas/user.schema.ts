@@ -16,23 +16,14 @@ export class User extends Document{
     @Prop({ unique: [true, 'Email already exists'] })
     email: string;
 
-    @Prop()
-    password: string;
-
     @Prop({default: 'guest'})
     role: string;
-
+    
     @Prop()
-    status: string;
-
+    phone: string;
+    
     @Prop()
-    createdAt: Date;
-
-    @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    password: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

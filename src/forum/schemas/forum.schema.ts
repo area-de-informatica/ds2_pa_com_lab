@@ -11,28 +11,13 @@ import { Document } from 'mongoose';
 
 export class Forum extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    issue: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    description: string;
 
     @Prop()
-    status: string;
-
-    @Prop()
-    createdAt: Date;
-
-    @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    category: string; 
 }
 
-export const UserSchema = SchemaFactory.createForClass(Forum);
+export const ForumSchema = SchemaFactory.createForClass(Forum);

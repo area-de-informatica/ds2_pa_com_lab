@@ -11,28 +11,7 @@ import { Document } from 'mongoose';
 
 export class Answer extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
-
-    @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
-
-    @Prop()
-    status: string;
-
-    @Prop()
-    createdAt: Date;
-
-    @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    message: string;  
 }
 
-export const UserSchema = SchemaFactory.createForClass(Answer);
+export const AnswerSchema = SchemaFactory.createForClass(Answer);

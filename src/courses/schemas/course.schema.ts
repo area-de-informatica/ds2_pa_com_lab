@@ -11,28 +11,19 @@ import { Document } from 'mongoose';
 
 export class Course extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    name: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    description: string;
 
     @Prop()
-    status: string;
+    percentage: string;
 
     @Prop()
-    createdAt: Date;
+    start_date: string;   
 
-    @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+     @Prop()
+    end_date: string;   
 }
 
-export const UserSchema = SchemaFactory.createForClass(Course);
+export const CourseSchema = SchemaFactory.createForClass(Course);

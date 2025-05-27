@@ -9,30 +9,24 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Activity extends Document{
+export class Activities extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    type: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    name: string;
 
     @Prop()
-    status: string;
+    description: string;
 
     @Prop()
-    createdAt: Date;
+    title: string;   
 
+     @Prop()
+    link: string; 
+    
     @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    state: string;   
 }
 
-export const ActividadesSchema = SchemaFactory.createForClass(Activity);
+export const ActivitySchema = SchemaFactory.createForClass(Activities);

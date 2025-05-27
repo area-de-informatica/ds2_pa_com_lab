@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsuariosModule } from './usuarios/usuarios.module';
-import { CursosModule } from './cursos/cursos.module';
-import { ForoModule } from './foro/foro.module';
-import { ContenidosModule } from './contenidos/contenidos.module';
-import { LeccionesModule } from './lecciones/lecciones.module';
-import { ActividadesModule } from './actividades/actividades.module';
-import { RespuestasModule } from './respuestas/respuestas.module';
-import { EntregasModule } from './entregas/entregas.module';
-import { UnidadesModule } from './unidades/unidades.module';
-import { ArchivosModule } from './archivos/archivos.module';
+import { UsuariosModule } from './users/usuarios.module';
+import { CursosModule } from './courses/cursos.module';
+import { ForoModule } from './forum/foro.module';
+import { ContenidosModule } from './contents/contenidos.module';
+import { LeccionesModule } from './lessons/lecciones.module';
+import { ActividadesModule } from './activities/actividades.module';
+import { RespuestasModule } from './answers/respuestas.module';
+import { EntregasModule } from './deliveries/entregas.module';
+import { UnidadesModule } from './units/unidades.module';
+import { ArchivosModule } from './folders/archivos.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 

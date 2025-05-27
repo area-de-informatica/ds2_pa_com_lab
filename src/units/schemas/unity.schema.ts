@@ -9,30 +9,21 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Unity extends Document{
+export class Unit extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    name: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    order: string;
 
     @Prop()
-    status: string;
+    category: string;
 
     @Prop()
-    createdAt: Date;
+    title: string;
 
     @Prop()
-    picture: string;
-
-    @Prop()
-    updatedAt: Date;    
+    text: string;   
 }
 
-export const UserSchema = SchemaFactory.createForClass(Unity);
+export const UnitySchema = SchemaFactory.createForClass(Unit);

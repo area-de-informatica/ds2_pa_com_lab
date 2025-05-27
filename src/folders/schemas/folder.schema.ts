@@ -9,30 +9,30 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Folder extends Document{
+export class Folders extends Document{
     @Prop()
-    username: string;
-
-    @Prop({ unique: [true, 'Email already exists'] })
-    email: string;
+    name: string;
 
     @Prop()
-    password: string;
-
-    @Prop({default: 'guest'})
-    role: string;
+    format: string; 
 
     @Prop()
-    status: string;
+    route: string; 
 
     @Prop()
-    createdAt: Date;
+    weigth: string;
+    
+    @Prop()
+    scale: string;
 
     @Prop()
-    picture: string;
+    order: string;
 
     @Prop()
-    updatedAt: Date;    
+    type: string;
+    
+    @Prop()
+    title: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(Folder);
+export const FoldersSchema = SchemaFactory.createForClass(Folders);
