@@ -9,7 +9,7 @@ import { LeccionesModule } from './lessons/lecciones.module';
 import { ActividadesModule } from './activities/actividades.module';
 import { RespuestasModule } from './answers/respuestas.module';
 import { EntregasModule } from './deliveries/entregas.module';
-import { UnidadesModule } from './units/unidades.module';
+import { UnidadesModule } from './Unidades/unidades.module';
 import { ArchivosModule } from './folders/archivos.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';

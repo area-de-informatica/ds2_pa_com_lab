@@ -11,7 +11,7 @@ import { Content} from '../../contents/schemas/content.schema';
     timestamps: true
 })
 
-export class Unit extends Document{
+export class Unidades extends Document{
     @Prop()
     name: string;
 
@@ -31,4 +31,4 @@ export class Unit extends Document{
     contents_id: Content[];
 }
 
-export const UnitySchema = SchemaFactory.createForClass(Unit);
+export const UnidadeSchema = SchemaFactory.createForClass(Unidades);

@@ -19,16 +19,16 @@ export class UnidadesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.unidadesService.findOne(+id);
+    return this.unidadesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUnidadeDto: UpdateUnidadeDto) {
-    return this.unidadesService.update(+id, updateUnidadeDto);
+    return this.unidadesService.update(id, updateUnidadeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.unidadesService.remove(+id);
+    return this.unidadesService.remove(id);
   }
 }
