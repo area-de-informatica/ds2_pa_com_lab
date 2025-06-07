@@ -19,16 +19,16 @@ export class ForoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.foroService.findOne(+id);
+    return this.foroService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateForoDto: UpdateForoDto) {
-    return this.foroService.update(+id, updateForoDto);
+    return this.foroService.update(id, updateForoDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.foroService.remove(+id);
+    return this.foroService.remove(id);
   }
 }

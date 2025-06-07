@@ -9,7 +9,7 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Folders extends Document{
+export class Archivo extends Document{
     @Prop()
     name: string;
 
@@ -20,10 +20,10 @@ export class Folders extends Document{
     route: string; 
 
     @Prop()
-    weigth: string;
+    size: string;
     
     @Prop()
-    scale: string;
+    extent: string;
 
     @Prop()
     order: string;
@@ -35,4 +35,4 @@ export class Folders extends Document{
     title: string;
 }
 
-export const FoldersSchema = SchemaFactory.createForClass(Folders);
+export const ArchivoSchema = SchemaFactory.createForClass(Archivo);

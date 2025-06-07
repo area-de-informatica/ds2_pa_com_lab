@@ -1,4 +1,4 @@
-//schemas/lesson.schema.ts
+//schemas/lecciones.schema.ts
 
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
@@ -9,7 +9,7 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Lesson extends Document{
+export class Leccione extends Document{
     @Prop()
     name: string;
 
@@ -17,4 +17,4 @@ export class Lesson extends Document{
     category: string;
 }
 
-export const LessonSchema = SchemaFactory.createForClass(Lesson);
+export const LeccioneSchema = SchemaFactory.createForClass(Leccione);

@@ -9,7 +9,7 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Forum extends Document{
+export class Foro extends Document{
     @Prop()
     issue: string;
 
@@ -20,4 +20,4 @@ export class Forum extends Document{
     category: string; 
 }
 
-export const ForumSchema = SchemaFactory.createForClass(Forum);
+export const ForoSchema = SchemaFactory.createForClass(Foro);
