@@ -1,5 +1,4 @@
-//schemas/unity.schema.ts
-
+//schemas/course.schema.ts
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from 'mongoose';
@@ -9,21 +8,21 @@ import { Document } from 'mongoose';
     timestamps: true
 })
 
-export class Unidades extends Document{
+export class Curso extends Document{
     @Prop()
     name: string;
 
     @Prop()
-    order: string;
+    description: string;
 
     @Prop()
-    category: string;
+    percentage: string;
 
     @Prop()
-    title: string;
+    start_date: string;   
 
-    @Prop()
-    text: string;  
+     @Prop()
+    end_date: string;   
 }
 
-export const UnidadeSchema = SchemaFactory.createForClass(Unidades);
+export const CursoSchema = SchemaFactory.createForClass(Curso);
