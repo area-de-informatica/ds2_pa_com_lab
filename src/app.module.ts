@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsuariosModule } from './users/usuarios.module';
+import { UsuariosModule } from './Usuarios/usuarios.module';
 import { CursosModule } from './courses/cursos.module';
 import { ForoModule } from './forum/foro.module';
 import { ContenidosModule } from './contents/contenidos.module';
@@ -14,10 +14,17 @@ import { ArchivosModule } from './folders/archivos.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-
-
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }), 
+
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async () => ({
+        uri: process.env.DB_URI,
+      }),
+      inject: [],
+    }),
     UsuariosModule, 
     CursosModule, 
     ForoModule, 
@@ -28,19 +35,9 @@ import { MongooseModule } from '@nestjs/mongoose';
     EntregasModule, 
     UnidadesModule, 
     ArchivosModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async () => ({
-        uri:"mongodb+srv://adminpardy:3rK25CowNngHMDDv@cluster0.hkvcyov.mongodb.net/db_complab?retryWrites=true&w=majority&appName=Cluster0",
-      }),
-      inject: [],
-      
-    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {}
+

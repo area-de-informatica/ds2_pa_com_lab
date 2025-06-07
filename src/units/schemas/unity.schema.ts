@@ -4,6 +4,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from 'mongoose';
 import { Document } from 'mongoose';
+import { Content} from '../../contents/schemas/content.schema';
+
 
 @Schema({
     timestamps: true
@@ -23,7 +25,10 @@ export class Unit extends Document{
     title: string;
 
     @Prop()
-    text: string;   
+    text: string;  
+    
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Content' }])
+    contents_id: Content[];
 }
 
 export const UnitySchema = SchemaFactory.createForClass(Unit);
