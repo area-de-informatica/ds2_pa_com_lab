@@ -35,5 +35,10 @@ export class EntregasController {
     @Get(':id/usuarios')
     findEntregaUsuarios (@Param('id') id: string) {
       return this.entregasService.findEntregaUsuarios(id);
+  }
+  
+  @Get(':id/actividades')
+    findEntregaActividad(@Param('id') id: string) {
+      return this.entregasService.findEntregaActividad(id);
   } 
 }

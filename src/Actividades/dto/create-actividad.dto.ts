@@ -1,1 +1,1 @@
-export class CreateActividadDto {}
+export class CreateActividadesDto {}
