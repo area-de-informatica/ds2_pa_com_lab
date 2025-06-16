@@ -16,15 +16,19 @@ export class LeccionesService {
   }
 
   async findAll(): Promise<Lecciones[]> {
-    return this.leccioneModel.find().populate('Unidades').exec();
+    return this.leccioneModel.find().populate('Unidades').populate('archivos').exec();
   }
 
   async findOne(id: string): Promise<Lecciones | null> {
-    return this.leccioneModel.findById(id).populate('Unidades').exec();
+    return this.leccioneModel.findById(id).populate('Unidades').populate('archivos').exec();
   }
 
   async findLeccionesUnidades(Id: string): Promise<Lecciones | null> {
     return this.leccioneModel.findById(Id).populate('Unidades').exec();
+  }
+
+  async findLeccionesArchivo(Id: string): Promise<Lecciones | null> {
+    return this.leccioneModel.findById(Id).populate('Archivos').exec();
   }
 
   async update(id: string, updateLeccioneDto: UpdateLeccionesDto): Promise<Lecciones | null> {

@@ -16,11 +16,11 @@ export class ArchivosService {
   }
 
   async findAll(): Promise<Archivo[]> {
-    return this.archivoModel.find().populate('entregas').populate('actividades').exec();
+    return this.archivoModel.find().populate('entregas').populate('actividades').populate('lecciones').exec();
   }
 
   async findOne(id: string): Promise<Archivo | null> {
-    return this.archivoModel.findById(id).populate('entregas').populate('actividades').exec();
+    return this.archivoModel.findById(id).populate('entregas').populate('actividades').populate('lecciones').exec();
   }
 
   async findArchivosEntrega(userId: string): Promise<Archivo | null> {
@@ -29,6 +29,10 @@ export class ArchivosService {
 
   async findArchivosActividad(userId: string): Promise<Archivo | null> {
     return this.archivoModel.findById(userId).populate('actividades').exec();
+  }
+
+  async findArchivosLecciones(userId: string): Promise<Archivo | null> {
+    return this.archivoModel.findById(userId).populate('lecciones').exec();
   }
 
   async update(id: string, updateArchivoDto: UpdateArchivoDto): Promise<Archivo | null> {

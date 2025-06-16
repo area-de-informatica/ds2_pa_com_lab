@@ -40,5 +40,10 @@ export class ArchivosController {
   @Get(':id/actividades')
   findArchivosActividad(@Param('id') id: string) {
     return this.archivosService.findArchivosActividad(id);
-} 
+  } 
+
+  @Get(':id/lecciones')
+    findArchivosLecciones (@Param('id') id: string) {
+      return this.archivosService.findArchivosLecciones(id);
+  }
 }

@@ -29,7 +29,7 @@ export class Unidades extends Document{
     Contenidos: Contenidos[]
 
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Lecciones' }])
-    Lecciones: Contenidos[]
+    Lecciones: Lecciones[]
 }
 
 export const UnidadeSchema = SchemaFactory.createForClass(Unidades);

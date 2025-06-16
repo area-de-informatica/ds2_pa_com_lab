@@ -36,4 +36,9 @@ export class LeccionesController {
     findLeccionesUnidades (@Param('id') id: string) {
       return this.leccionesService.findLeccionesUnidades(id);
   }
+
+  @Get(':id/archivos')
+    findLeccionesArchivo(@Param('id') id: string) {
+      return this.leccionesService.findLeccionesArchivo(id);
+  } 
 }
