@@ -16,15 +16,19 @@ export class UsuariosService {
   }
 
   async findAll(): Promise<Usuario[]> {
-    return this.usuarioModel.find().exec();
+    return this.usuarioModel.find().populate('cursos').exec();
   }
 
   async findOne(id: string): Promise<Usuario | null> {
-    return this.usuarioModel.findById(id).exec();
+    return this.usuarioModel.findById(id).populate('cursos').exec();
+  }
+
+  async findUserCursos(userId: string): Promise<Usuario | null> {
+    return this.usuarioModel.findById(userId).populate('cursos').exec();
   }
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario | null> {
-    return this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, { new: true }).exec();
+    return this.usuarioModel.findByIdAndUpdate(id, updateUsuarioDto, { new: true });
   }
 
   async remove(id: string): Promise<Usuario | null> {

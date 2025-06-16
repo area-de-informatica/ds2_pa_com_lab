@@ -31,4 +31,10 @@ export class UsuariosController {
   remove(@Param('id') id: string) {
     return this.usuariosService.remove(id);
   }
+
+  @Get(':id/cursos')
+  findUserCursos(@Param('id') id: string) {
+    return this.usuariosService.findUserCursos(id);
+  }
 }
+
