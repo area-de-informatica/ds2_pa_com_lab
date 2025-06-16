@@ -31,4 +31,9 @@ export class ActividadesController {
   remove(@Param('id') id: string) {
     return this.actividadesService.remove(id);
   }
+
+  @Get(':id/entregas')
+  findActividadesEntrega(@Param('id') id: string) {
+    return this.actividadesService.findActividadesEntrega(id);
+  }
 }
