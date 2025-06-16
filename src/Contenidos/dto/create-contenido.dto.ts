@@ -1,1 +1,1 @@
-export class CreateContenidoDto {}
+export class CreateContenidosDto {}

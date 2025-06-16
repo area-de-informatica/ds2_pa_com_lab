@@ -1,1 +1,1 @@
-export class Unidade {}
+export class Unidades {}

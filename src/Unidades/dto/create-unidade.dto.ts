@@ -1,1 +1,1 @@
-export class CreateUnidadeDto {}
+export class CreateUnidadesDto {}

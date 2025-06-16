@@ -1,33 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUnidadeDto } from './dto/create-unidade.dto';
-import { UpdateUnidadeDto } from './dto/update-unidade.dto';
+import { CreateUnidadesDto } from './dto/create-unidade.dto';
+import { UpdateUnidadesDto } from './dto/update-unidade.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UnidadeSchema } from './schemas/unidades.schema';
-import { Unidade } from './entities/unidade.entity';
+import { Unidades } from './entities/unidade.entity';
 
 @Injectable()
 export class UnidadesService {
-  constructor(@InjectModel(Unidade.name) private unidadeModel: Model<Unidade>) {}
+  constructor(@InjectModel(Unidades.name) private unidadeModel: Model<Unidades>) {}
 
-  async create(createUnidadeDto: CreateUnidadeDto): Promise<Unidade> {
+  async create(createUnidadeDto: CreateUnidadesDto): Promise<Unidades> {
     const createdUnidade = new this.unidadeModel(createUnidadeDto);
     return createdUnidade.save();
   }
 
-  async findAll(): Promise<Unidade[]> {
-    return this.unidadeModel.find().exec();
+  async findAll(): Promise<Unidades[]> {
+    return this.unidadeModel.find().populate('Contenidos').exec();
   }
 
-  async findOne(id: string): Promise<Unidade | null> {
-    return this.unidadeModel.findById(id).exec();
+  async findOne(id: string): Promise<Unidades | null> {
+    return this.unidadeModel.findById(id).populate('Contenidos').exec();
   }
 
-  async update(id: string, updateUnidadeDto: UpdateUnidadeDto): Promise<Unidade | null> {
+  async findUnidadesContenido(Id: string): Promise<Unidades | null> {
+    return this.unidadeModel.findById(Id).populate('Contenidos').exec();
+  }
+  
+  async update(id: string, updateUnidadeDto: UpdateUnidadesDto): Promise<Unidades | null> {
     return this.unidadeModel.findByIdAndUpdate(id, updateUnidadeDto, { new: true }).exec();
   }
 
-  async remove(id: string): Promise<Unidade | null> {
+  async remove(id: string): Promise<Unidades | null> {
     return this.unidadeModel.findByIdAndDelete(id).exec()
 }
 }

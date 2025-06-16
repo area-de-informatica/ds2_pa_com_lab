@@ -6,7 +6,7 @@ import { UnidadeSchema } from './schemas/unidades.schema';
 
 @Module({
   imports :[
-  MongooseModule.forFeature([{ name: 'Unidade', schema: UnidadeSchema }])
+  MongooseModule.forFeature([{ name: 'Unidades', schema: UnidadeSchema }])
   ],
   controllers: [UnidadesController],
   providers: [UnidadesService],

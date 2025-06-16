@@ -6,7 +6,7 @@ import { ContenidoSchema } from './schemas/contenidos.schema';
 
 @Module({
   imports :[
-  MongooseModule.forFeature([{ name: 'Contenido', schema: ContenidoSchema }])
+  MongooseModule.forFeature([{ name: 'Contenidos', schema: ContenidoSchema }])
   ],
   controllers: [ContenidosController],
   providers: [ContenidosService],

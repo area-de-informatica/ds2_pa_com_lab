@@ -1,14 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UnidadesService } from './unidades.service';
-import { CreateUnidadeDto } from './dto/create-unidade.dto';
-import { UpdateUnidadeDto } from './dto/update-unidade.dto';
+import { CreateUnidadesDto } from './dto/create-unidade.dto';
+import { UpdateUnidadesDto } from './dto/update-unidade.dto';
 
 @Controller('unidades')
 export class UnidadesController {
   constructor(private readonly unidadesService: UnidadesService) {}
 
   @Post()
-  create(@Body() createUnidadeDto: CreateUnidadeDto) {
+  create(@Body() createUnidadeDto: CreateUnidadesDto) {
     return this.unidadesService.create(createUnidadeDto);
   }
 
@@ -23,12 +23,17 @@ export class UnidadesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUnidadeDto: UpdateUnidadeDto) {
+  update(@Param('id') id: string, @Body() updateUnidadeDto: UpdateUnidadesDto) {
     return this.unidadesService.update(id, updateUnidadeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.unidadesService.remove(id);
+  }
+
+  @Get(':id/Contenidos')
+    findUnidadesContenido (@Param('id') id: string) {
+      return this.unidadesService.findUnidadesContenido(id);
   }
 }
