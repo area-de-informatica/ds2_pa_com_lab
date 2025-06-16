@@ -31,4 +31,9 @@ export class EntregasController {
   remove(@Param('id') id: string) {
     return this.entregasService.remove(id);
   }
+
+    @Get(':id/usuarios')
+    findEntregaUsuarios (@Param('id') id: string) {
+      return this.entregasService.findEntregaUsuarios(id);
+  } 
 }

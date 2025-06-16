@@ -16,11 +16,15 @@ export class EntregasService {
   }
 
   async findAll(): Promise<Entrega[]> {
-    return this.entregaModel.find().exec();
+    return this.entregaModel.find().populate('usuarios').exec();
   }
 
   async findOne(id: string): Promise<Entrega | null> {
-    return this.entregaModel.findById(id).exec();
+    return this.entregaModel.findById(id).populate('usuarios').exec();
+  }
+
+  async findEntregaUsuarios(Id: string): Promise<Entrega | null> {
+    return this.entregaModel.findById(Id).populate('usuarios').exec();
   }
 
   async update(id: string, updateEntregaDto: UpdateEntregaDto): Promise<Entrega | null> {

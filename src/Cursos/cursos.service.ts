@@ -16,11 +16,15 @@ export class CursosService {
   }
 
   async findAll(): Promise<Curso[]> {
-    return this.cursoModel.find().exec();
+    return this.cursoModel.find().populate('usuarios').exec();
   }
 
   async findOne(id: string): Promise<Curso | null> {
-    return this.cursoModel.findById(id).exec();
+    return this.cursoModel.findById(id).populate('usuarios').exec();
+  }
+
+  async findCursoUsuarios(Id: string): Promise<Curso | null> {
+    return this.cursoModel.findById(Id).populate('usuarios').exec();
   }
 
   async update(id: string, updateCursoDto: UpdateCursoDto): Promise<Curso | null> {

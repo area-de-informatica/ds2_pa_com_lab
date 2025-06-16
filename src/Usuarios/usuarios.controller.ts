@@ -35,6 +35,10 @@ export class UsuariosController {
   @Get(':id/cursos')
   findUserCursos(@Param('id') id: string) {
     return this.usuariosService.findUserCursos(id);
-  }
 }
 
+  @Get(':id/entregas')
+  findUserEntregas(@Param('id') id: string) {
+    return this.usuariosService.findUserEntregas(id);
+  }
+}
