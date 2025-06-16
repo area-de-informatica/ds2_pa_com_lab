@@ -1,1 +1,1 @@
-export class CreateLeccioneDto {}
+export class CreateLeccionesDto {}

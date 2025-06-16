@@ -1,14 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { LeccionesService } from './lecciones.service';
-import { CreateLeccioneDto } from './dto/create-leccione.dto';
-import { UpdateLeccioneDto } from './dto/update-leccione.dto';
+import { CreateLeccionesDto } from './dto/create-leccione.dto';
+import { UpdateLeccionesDto } from './dto/update-leccione.dto';
 
 @Controller('lecciones')
 export class LeccionesController {
   constructor(private readonly leccionesService: LeccionesService) {}
 
   @Post()
-  create(@Body() createLeccioneDto: CreateLeccioneDto) {
+  create(@Body() createLeccioneDto: CreateLeccionesDto) {
     return this.leccionesService.create(createLeccioneDto);
   }
 
@@ -23,12 +23,17 @@ export class LeccionesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLeccioneDto: UpdateLeccioneDto) {
+  update(@Param('id') id: string, @Body() updateLeccioneDto: UpdateLeccionesDto) {
     return this.leccionesService.update(id, updateLeccioneDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.leccionesService.remove(id);
+  }
+
+  @Get(':id/Unidades')
+    findLeccionesUnidades (@Param('id') id: string) {
+      return this.leccionesService.findLeccionesUnidades(id);
   }
 }

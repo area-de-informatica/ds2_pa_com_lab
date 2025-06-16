@@ -1,1 +1,1 @@
-export class Leccione {}
+export class Lecciones {}

@@ -31,4 +31,14 @@ export class ArchivosController {
   remove(@Param('id') id: string) {
     return this.archivosService.remove(id);
   }
+
+  @Get(':id/entregas')
+  findEArchivosEntrega(@Param('id') id: string) {
+    return this.archivosService.findArchivosEntrega(id);
+  }
+
+  @Get(':id/actividades')
+  findArchivosActividad(@Param('id') id: string) {
+    return this.archivosService.findArchivosActividad(id);
+} 
 }

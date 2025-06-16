@@ -41,4 +41,9 @@ export class EntregasController {
     findEntregaActividad(@Param('id') id: string) {
       return this.entregasService.findEntregaActividad(id);
   } 
+
+  @Get(':id/archivos')
+    findEntregaArchivo(@Param('id') id: string) {
+      return this.entregasService.findEntregaArchivo(id);
+  } 
 }

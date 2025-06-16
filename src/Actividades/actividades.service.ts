@@ -16,16 +16,20 @@ export class ActividadesService {
   }
 
   async findAll(): Promise<Actividad[]> {
-    return this.actividadModel.find().populate('entregas').exec();
+    return this.actividadModel.find().populate('entregas').populate('archivos').exec();
   }
 
   async findOne(id: string): Promise<Actividad | null> {
-    return this.actividadModel.findById(id).populate('entregas').exec();
+    return this.actividadModel.findById(id).populate('entregas').populate('archivos').exec();
   }
 
   async findActividadesEntrega(Id: string): Promise<Actividad | null> {
     return this.actividadModel.findById(Id).populate('entregas').exec(); 
-}
+  }
+
+  async findActividadesArchivo(Id: string): Promise<Actividad | null> {
+  return this.actividadModel.findById(Id).populate('archivos').exec(); 
+  }
 
   async update(id: string, UpdateActividadesDto: UpdateActividadesDto): Promise<Actividad | null> {
     return this.actividadModel.findByIdAndUpdate(id, UpdateActividadesDto, { new: true }).exec();

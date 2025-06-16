@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import { Document } from 'mongoose';
 import { Unidades } from '../../Unidades/schemas/unidades.schema'
 
-
 @Schema({
     timestamps: true
 })

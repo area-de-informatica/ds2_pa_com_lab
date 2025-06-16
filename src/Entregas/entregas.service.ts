@@ -16,12 +16,12 @@ export class EntregasService {
   }
 
   async findAll(): Promise<Entrega[]> {
-    return this.entregaModel.find().populate('usuarios').populate('actividades').exec();
+    return this.entregaModel.find().populate('usuarios').populate('actividades').populate('archivos').exec();
 
   }
 
   async findOne(id: string): Promise<Entrega | null> {
-    return this.entregaModel.findById(id).populate('usuarios').populate('actividades').exec();
+    return this.entregaModel.findById(id).populate('usuarios').populate('actividades').populate('archivos').exec();
   }
 
   async findEntregaUsuarios(Id: string): Promise<Entrega | null> {
@@ -30,7 +30,11 @@ export class EntregasService {
 
   async findEntregaActividad(Id: string): Promise<Entrega | null> {
     return this.entregaModel.findById(Id).populate('actividades').exec(); 
-}
+  }
+
+  async findEntregaArchivo(Id: string): Promise<Entrega | null> {
+    return this.entregaModel.findById(Id).populate('archivos').exec(); 
+  }
 
   async update(id: string, updateEntregaDto: UpdateEntregaDto): Promise<Entrega | null> {
     return this.entregaModel.findByIdAndUpdate(id, updateEntregaDto, { new: true }).exec();

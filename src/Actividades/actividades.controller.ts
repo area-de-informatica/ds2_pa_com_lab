@@ -36,4 +36,9 @@ export class ActividadesController {
   findActividadesEntrega(@Param('id') id: string) {
     return this.actividadesService.findActividadesEntrega(id);
   }
+
+  @Get(':id/archivos')
+    findActividadesArchivo(@Param('id') id: string) {
+      return this.actividadesService.findActividadesArchivo(id);
+  } 
 }

@@ -6,7 +6,7 @@ import { LeccioneSchema } from './schemas/lecciones.schema';
 
 @Module({
   imports :[
-  MongooseModule.forFeature([{ name: 'Leccione', schema: LeccioneSchema }])
+  MongooseModule.forFeature([{ name: 'Lecciones', schema: LeccioneSchema }])
   ],
   controllers: [LeccionesController],
   providers: [LeccionesService],

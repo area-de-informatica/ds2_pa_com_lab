@@ -16,15 +16,19 @@ export class UnidadesService {
   }
 
   async findAll(): Promise<Unidades[]> {
-    return this.unidadeModel.find().populate('Contenidos').exec();
+    return this.unidadeModel.find().populate('Contenidos').populate('Lecciones').exec();
   }
 
   async findOne(id: string): Promise<Unidades | null> {
-    return this.unidadeModel.findById(id).populate('Contenidos').exec();
+    return this.unidadeModel.findById(id).populate('Contenidos').populate('Lecciones').exec();
   }
 
   async findUnidadesContenido(Id: string): Promise<Unidades | null> {
     return this.unidadeModel.findById(Id).populate('Contenidos').exec();
+  }
+
+  async findUnidadesLecciones(Id: string): Promise<Unidades | null> {
+    return this.unidadeModel.findById(Id).populate('Lecciones').exec();
   }
   
   async update(id: string, updateUnidadeDto: UpdateUnidadesDto): Promise<Unidades | null> {
