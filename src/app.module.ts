@@ -11,19 +11,20 @@ import { RespuestasModule } from './Respuestas/respuestas.module';
 import { EntregasModule } from './Entregas/entregas.module';
 import { UnidadesModule } from './Unidades/unidades.module';
 import { ArchivosModule } from './Archivos/archivos.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), 
+    ConfigModule.forRoot({ isGlobal: true }),
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async () => ({
-        uri: process.env.DB_URI,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('DB_URI'),
       }),
-      inject: [],
     }),
     UsuariosModule, 
     CursosModule, 
