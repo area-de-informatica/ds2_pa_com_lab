@@ -14,7 +14,6 @@ import { ArchivosModule } from './Archivos/archivos.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
