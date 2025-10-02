@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Aplicación con Autenticación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="auth-container">
+        <!-- Formulario de Registro -->
+        <!-- CORREGIDO: Se quitó el onsubmit="handleRegister(event)" -->
+        <form id="register-form">
+            <h2>Registro</h2>
+            <input type="text" id="register-username" placeholder="Nombre de usuario" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <hr>
+
+        <!-- Formulario de Inicio de Sesión -->
+        <!-- CORREGIDO: Se quitó el onsubmit="handleLogin(event)" -->
+        <form id="login-form">
+            <h2>Iniciar Sesión</h2>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <div id="content-container" style="display: none;">
+        <h1>¡Bienvenido!</h1>
+        <p>Has iniciado sesión correctamente.</p>
+        <!-- CORREGIDO: Se añadió un ID al botón para poder vincular el evento en JS -->
+        <button id="logout-button">Cerrar Sesión</button>
+    </div>
+
+    <!-- Contenedor para mostrar mensajes de éxito o error -->
+    <div id="message-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

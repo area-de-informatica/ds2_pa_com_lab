@@ -4,7 +4,6 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './schemas/usuarios.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsuarioSchema } from './schemas/usuarios.schema';
 
 @Injectable()
 export class UsuariosService {
@@ -13,6 +12,10 @@ export class UsuariosService {
   async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const createdUsuario = new this.usuarioModel(createUsuarioDto);
     return createdUsuario.save();
+  }
+
+  async findByEmail(email: string): Promise<Usuario | null> {
+    return this.usuarioModel.findOne({ email: email }).exec();
   }
 
   async findAll(): Promise<Usuario[]> {
@@ -36,6 +39,6 @@ export class UsuariosService {
   }
 
   async remove(id: string): Promise<Usuario | null> {
-    return this.usuarioModel.findByIdAndDelete(id).exec()
-}
+    return this.usuarioModel.findByIdAndDelete(id).exec();
+  }
 }
