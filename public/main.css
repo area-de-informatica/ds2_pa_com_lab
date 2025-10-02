@@ -32,10 +32,7 @@ html, body{
 body{
   font-family: Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(900px 500px at 10% -10%, #fff 0%, transparent 60%),
-    radial-gradient(900px 600px at 100% 0%, #fff 0%, transparent 60%),
-    var(--bg);
+  background: var(--bg);
   overflow-x: hidden;
 }
 

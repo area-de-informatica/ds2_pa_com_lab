@@ -1,10 +1,3 @@
-/* =========================
-   Complab FOTO - styles.css
-   Público: estudiantes (mobile-first)
-   Tipografías (HTML): Orbitron / Roboto
-   ========================= */
-
-/* --------- Tema (colores foto-friendly) --------- */
 :root{
   --bg: #d8e3f8;             /* azul pastel suave */
   --ink: #1f2937;            /* texto principal */
