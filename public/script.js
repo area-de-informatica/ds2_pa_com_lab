@@ -1,11 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Lógica de Autenticación y Vistas ---
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        window.location.href = 'main.html';
-        return;
-    }
-
+    // --- Vistas de Login y Registro ---
     const loginView = document.getElementById('login-view');
     const registerView = document.getElementById('register-view');
     const showRegisterLink = document.getElementById('show-register');
@@ -28,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Formularios ---
     const registerForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
 
@@ -36,18 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica del Carrusel de Imágenes ---
     const contentContainer = document.getElementById('content-container');
-    // Verifica si el contenedor del carrusel es visible (solo en desktop)
     if (contentContainer && getComputedStyle(contentContainer).display !== 'none') {
         const slides = contentContainer.querySelectorAll('.slide');
         let currentSlide = 0;
 
-        // Inicia el carrusel solo si hay más de una imagen
         if (slides.length > 1) {
             setInterval(() => {
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
-            }, 5000); // Cambia de imagen cada 5 segundos
+            }, 5000);
         }
     }
 });

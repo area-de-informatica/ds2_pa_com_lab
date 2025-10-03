@@ -3,27 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complab - Panel Principal</title>
+    <title>Panel Principal</title>
+
+    <!-- **CORREGIDO: Script de Verificación de Sesión** -->
+    <script>
+        // Se busca el token con el nombre correcto: 'access_token'
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            // Si no hay token, redirigir a la página de login y detener la carga.
+            window.location.replace('index.html'); 
+        }
+    </script>
+
     <link rel="stylesheet" href="main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="site-wrapper">
-
         <header class="main-header">
-            <div class="logo">Complab</div>
-            <nav>
-                <button id="logout-button">Cerrar Sesión</button>
-            </nav>
+            <a href="#" class="logo">Complab</a>
+            
+            <div class="user-menu">
+                <div class="dropdown">
+                    <button id="settings-btn" class="dropdown-btn">
+                        <span>Configuración</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                    <div id="dropdown-content" class="dropdown-content">
+                        <a href="#" id="profile-link">Mi Perfil</a>
+                        <a href="#" id="logout-button">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main class="main-content">
             <h1>Panel de Control Principal</h1>
             <p>Este es el lienzo para tu aplicación. ¡Añade tus componentes aquí!</p>
-            <!-- Aquí puedes empezar a construir la interfaz principal -->
         </main>
 
+        <div id="profile-view" style="display: none;">
+            <!-- Contenido del perfil -->
+        </div>
     </div>
 
     <script src="main.js"></script>

@@ -113,39 +113,87 @@ body::before{
   margin: 0 auto 1.5rem auto;
 }
 
-/* --------- Botón de Cerrar Sesión --------- */
-#logout-button{
-  cursor: pointer;
-  border: none;
-  border-radius: var(--radius);
-  padding: 0.75rem 1.5rem;
-  font-weight: 700;
-  letter-spacing: .2px;
-  color: #fff;
-  background: var(--accent);
-  box-shadow: 0 8px 20px rgba(0,181,173,.22);
-  position: relative;
-  overflow: hidden;
-  transition: transform .08s ease, filter .2s ease, box-shadow .2s ease;
+/* --------- NUEVO: Menú Desplegable de Configuración --------- */
+.user-menu .dropdown {
+    position: relative; /* Contenedor para el menú */
 }
 
-#logout-button::after{
-  content:"";
-  position: absolute;
-  left: -40%; top: -50%;
-  width: 40%; height: 200%;
-  transform: rotate(25deg);
-  background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.45), rgba(255,255,255,.0));
-  transition: left .35s ease;
+/* --------- NUEVO: Botón Desplegable con Contraste y Borde Primario --------- */
+
+.dropdown-btn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    /* Fondo blanco limpio y borde sutil (estado normal) */
+    background-color: var(--card); 
+    border: 1px solid var(--card-brd);
+    
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink); /* Texto principal (oscuro) */
+    
+    box-shadow: 0 4px 8px rgba(17, 24, 39, 0.05); /* Sombra muy sutil */
+    
+    transition: all .25s ease-out;
 }
 
-#logout-button:hover::after{ left: 120%; }
-#logout-button:hover{ filter: brightness(1.03); }
-#logout-button:active{ transform: translateY(1px); }
+.dropdown-btn:hover {
+    /* Al hacer hover: Destacamos con el color Primario */
+    background-color: var(--card); /* Mantiene el fondo blanco */
+    color: var(--primary); /* El texto se vuelve rojo primario */
+    border-color: var(--primary); /* El borde se vuelve rojo primario */
+    
+    /* Animación: Se levanta ligeramente, como un interruptor */
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(107, 233, 255, 0.15); /* Sombra que insinúa el color de acento */
+}
+.dropdown-btn svg {
+    transition: transform 0.2s;
+}
 
-/* Foco accesible */
-#logout-button:focus{
-  outline: 3px solid rgba(255,209,102,.65);
-  outline-offset: 2px;
-  border-radius: 10px;
+/* Gira la flecha cuando el menú está abierto */
+.dropdown-btn.open svg {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    display: none; /* Oculto por defecto */
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px); /* Espacio entre el botón y el menú */
+    min-width: 180px;
+    background-color: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--card-brd);
+    box-shadow: var(--shadow);
+    z-index: 100;
+    overflow: hidden;
+    animation: fadeIn .2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-content.show {
+    display: block; /* Muestra el menú */
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 0.8rem 1.2rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: #f3f4f6;
+    color: var(--ink);
 }
