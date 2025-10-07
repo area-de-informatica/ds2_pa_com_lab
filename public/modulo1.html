@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 1: Fotografía</title>
+    <title>Módulo</title>
 
     <script>
         const token = localStorage.getItem('access_token');
@@ -42,14 +42,46 @@
 
         <main class="main-content">
             <section class="boosters-section">
-                <h1 class="boosters-title">Módulo 1: Fotografía</h1>
+                <h1 id="module-title" class="boosters-title"></h1>
                 <div class="title-underline"></div> 
 
-                <p>Contenido del Módulo 1 sobre fotografía.</p>
+                <p id="module-content"></p>
             </section>
         </main>
     </div>
 
     <script src="main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const cursoId = urlParams.get('cursoId');
+
+            const moduleTitle = document.getElementById('module-title');
+            const moduleContent = document.getElementById('module-content');
+            
+            if (!cursoId) {
+                moduleTitle.textContent = 'Error';
+                moduleContent.textContent = 'No se ha especificado un ID de curso.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/cursos/${cursoId}`);
+                if (!response.ok) {
+                    throw new Error('No se pudo cargar la información del curso.');
+                }
+                const curso = await response.json();
+                
+                // Update page content
+                document.title = `Módulo: ${curso.nombre}`;
+                moduleTitle.textContent = `MÓDULO: ${curso.nombre.toUpperCase()}`;
+                moduleContent.textContent = curso.descripcion;
+
+            } catch (error) {
+                moduleTitle.textContent = 'Error al cargar';
+                moduleContent.textContent = error.message;
+            }
+        });
+    </script>
 </body>
 </html>

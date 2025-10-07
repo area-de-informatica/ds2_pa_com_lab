@@ -218,8 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (target.closest('.card-content-link')) {
                 e.preventDefault();
                 const cursoId = target.closest('.card-content-link').dataset.cursoId;
-                console.log(`Navegar al curso con ID: ${cursoId}`);
-                showMessage(`Próximamente: Módulo para el curso ${cursoId}`);
+                window.location.href = `modulo1.html?cursoId=${cursoId}`;
             }
         });
     }
