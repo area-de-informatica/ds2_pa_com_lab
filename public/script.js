@@ -75,6 +75,10 @@ async function handleRegister(event) {
         });
 
         if (response.ok) {
+            // **NUEVO: Guardar los datos del perfil del usuario en el registro**
+            const userProfile = { username, phone };
+            localStorage.setItem(`profile_${email}`, JSON.stringify(userProfile));
+
             showMessage('¡Registro exitoso! Ahora puedes iniciar sesión.');
             document.getElementById('register-form').reset();
             document.getElementById('register-view').style.display = 'none';
@@ -103,7 +107,9 @@ async function handleLogin(event) {
 
         if (response.ok) {
             const data = await response.json();
+            // Guardamos el token y el email para la sesión
             localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user_email', email); 
             window.location.href = 'main.html';
         } else {
             const error = await response.json();

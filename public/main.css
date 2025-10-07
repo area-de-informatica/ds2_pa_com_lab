@@ -68,6 +68,16 @@ body::before{
   margin-bottom: 2rem;
 }
 
+/* --------- NUEVO: Mensaje de Bienvenida --------- */
+.welcome-message {
+    flex-grow: 1; /* Ocupa el espacio disponible en el centro */
+    text-align: center; /* Centra el texto */
+    font-size: 1.5rem; /* Tamaño de fuente grande y legible */
+    font-weight: 500; /* Un peso de fuente amigable */
+    color: var(--ink-soft); /* Color de texto suave */
+    animation: fadeIn 0.5s ease-in-out; /* Animación sutil de aparición */
+}
+
 .logo{
   font-family: Orbitron, Roboto, sans-serif;
   font-weight: 700;
@@ -197,6 +207,10 @@ body::before{
     .subject-cards-grid {
         /* En pantallas pequeñas, las tarjetas se apilan verticalmente */
         grid-template-columns: 1fr;
+    }
+
+    .welcome-message {
+        display: none; /* Oculta el mensaje en pantallas pequeñas para dar espacio */
     }
 }
 
