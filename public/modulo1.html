@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Principal</title>
+    <title>Módulo 1: Fotografía</title>
 
-    <!-- **CORREGIDO: Script de Verificación de Sesión** -->
     <script>
-        // Se busca el token con el nombre correcto: 'access_token'
         const token = localStorage.getItem('access_token');
         if (!token) {
-            // Si no hay token, redirigir a la página de login y detener la carga.
             window.location.replace('index.html'); 
         }
     </script>
@@ -44,37 +41,13 @@
         </header>
 
         <main class="main-content">
-        <section class="boosters-section">
-            <h1 class="boosters-title">Explora tu Potencial Creativo</h1>
-            <div class="title-underline"></div> 
+            <section class="boosters-section">
+                <h1 class="boosters-title">Módulo 1: Fotografía</h1>
+                <div class="title-underline"></div> 
 
-            <div class="subject-cards-grid">
-                <a href="modulo1.html" class="subject-card photography-card">
-                    <div class="card-icon">
-                        <i class="fas fa-camera"></i>
-                    </div>
-                    <h3 class="card-caption">Módulo 1: Fotografía</h3>
-                    <p class="card-description">
-                        Domina los conceptos clave de la fotografía, desde la exposición hasta la composición, para capturar imágenes impactantes.
-                    </p>
-                </a>
-                
-                <a href="#" class="subject-card editing-card">
-                    <div class="card-icon">
-                        <i class="fas fa-pencil-alt"></i>
-                    </div>
-                    <h3 class="card-caption">Módulo 2: Edición</h3>
-                    <p class="card-description">
-                        Aprende a transformar tus fotos con técnicas de edición profesionales para revelar su máximo potencial creativo.
-                    </p>
-                </a>
-            </div>
-        </section>
-    </main>
-
-        <div id="profile-view" style="display: none;">
-            <!-- Contenido del perfil -->
-        </div>
+                <p>Contenido del Módulo 1 sobre fotografía.</p>
+            </section>
+        </main>
     </div>
 
     <script src="main.js"></script>
