@@ -1,32 +1,39 @@
-//schemas/course.schema.ts
+// src/Cursos/schemas/cursos.schema.ts
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from 'mongoose';
 import { Document } from 'mongoose';
-import { Usuario } from '../../Usuarios/schemas/usuarios.schema'
+// Haremos referencia al Schema de Usuario para la relación de inscritos
+import { Usuario } from '../../Usuarios/schemas/usuarios.schema';
 
 @Schema({
-    timestamps: true
+    timestamps: true // Esto añade automáticamente createdAt y updatedAt
 })
+export class Curso extends Document {
+    @Prop({
+        required: true,
+        trim: true, // Limpia espacios en blanco al inicio y final
+    })
+    nombre: string;
 
-export class Curso extends Document{
+    @Prop({
+        required: true,
+        trim: true,
+    })
+    descripcion: string;
+
     @Prop()
-    name: string;
+    porcentaje: number; // El porcentaje debería ser un número
 
     @Prop()
-    description: string;
+    fecha_inicio: Date; // Usar el tipo Date para las fechas
 
     @Prop()
-    percentage: string;
-
-    @Prop()
-    start_date: string;   
-
-     @Prop()
-    end_date: string;  
+    fecha_fin: Date; // Usar el tipo Date para las fechas
     
+    // Esta es la relación n:n con Usuarios (los inscritos en el curso)
     @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }])
-    usuarios: Usuario[]
+    inscritos: Usuario[]; // Cambiado 'usuarios' a 'inscritos' para más claridad
 }
 
 export const CursoSchema = SchemaFactory.createForClass(Curso);

@@ -9,12 +9,8 @@
   --accent-2: #ffd166;
   --card: #ffffff;
   --card-brd: #e5e7eb;
-  --color-text-dark: #212529;
   --color-text-light: #ffffff;
-  --color-background-soft: #d0dcef;
   --color-underline: #ffc107;
-  --color-photography: #FF7043; 
-  --color-editing: #29B6F6;
   --shadow: 0 10px 30px rgba(17, 24, 39, .08);
   --radius-lg: 18px;
   --radius: 14px;
@@ -27,34 +23,14 @@
   padding: 0;
 }
 
-@media (prefers-reduced-motion: reduce){
-  *{ animation: none !important; transition: none !important; }
-}
-
-html, body{
-  height: 100%;
-}
-
 body{
   font-family: Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   color: var(--ink);
   background: var(--bg);
-  overflow-x: hidden;
 }
 
-/* Textura de papel */
-body::before{
-  content:"";
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cdefs%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 .02 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cdefs%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: .35;
-  pointer-events: none;
-}
-
-/* --------- Layout Principal --------- */
 .site-wrapper{
   max-width: 1200px;
-  width: 100%;
   margin: 0 auto;
   padding: clamp(1rem, 1.2vw, 1.25rem);
 }
@@ -68,14 +44,12 @@ body::before{
   margin-bottom: 2rem;
 }
 
-/* --------- NUEVO: Mensaje de Bienvenida --------- */
 .welcome-message {
-    flex-grow: 1; /* Ocupa el espacio disponible en el centro */
-    text-align: center; /* Centra el texto */
-    font-size: 1.5rem; /* Tamaño de fuente grande y legible */
-    font-weight: 500; /* Un peso de fuente amigable */
-    color: var(--ink-soft); /* Color de texto suave */
-    animation: fadeIn 0.5s ease-in-out; /* Animación sutil de aparición */
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--ink-soft);
 }
 
 .logo{
@@ -102,177 +76,150 @@ body::before{
 .main-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem 1.5rem; /* Reducido el padding superior */
-    text-align: center;
+    padding: 1rem 1.5rem;
 }
 
-.boosters-section {
-    padding-top: 0; /* Reducido el padding superior */
-    padding-bottom: 2rem;
+.section-header {
+    display: flex;
+    justify-content: center; /* Centrado */
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative; /* Para el botón */
 }
 
-/* === TÍTULO Y SUBLINEADO === */
 .boosters-title {
     font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 1rem;
+    text-align: center;
     text-transform: uppercase;
-    color: #2563eb; /* Azul brillante */
-    animation: pulse 2s infinite ease-in-out;
+    color: #2563eb;
+    margin: 0;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+#add-course-btn {
+    position: absolute;
+    right: 0;
+    white-space: nowrap;
 }
 
-.title-underline {
-    width: 60px;
-    height: 4px;
-    background-color: var(--color-underline);
-    margin: 0 auto 2rem auto;
-    border-radius: 2px;
-}
 
-/* === CUADRÍCULA DE TARJETAS === */
+/* === Cuadrícula de Tarjetas === */
 .subject-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
     justify-content: center;
 }
 
-/* === ESTILO BASE DE LAS TARJETAS === */
 .subject-card {
     border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none; /* Elimina el subrayado de los enlaces */
-    color: var(--color-text-light); /* Texto blanco */
-    display: flex; 
+    background: #e54b4b;
+    color: var(--color-text-light);
+    display: flex;
     flex-direction: column;
-    align-items: center; /* Centra horizontalmente el contenido interno */
-    padding: 2.5rem;
-    text-align: center;
+    justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
 }
-
-/* Colores específicos por tarjeta */
-.photography-card {
-    background-color: var(--color-photography);
-}
-
-.editing-card {
-    background-color: var(--color-editing);
-}
-
-/* Efecto al pasar el ratón */
 .subject-card:hover {
-    transform: translateY(-8px); /* Eleva la tarjeta */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra más intensa */
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Icono (fas fa-camera, fas fa-magic) */
+.card-content-link {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-decoration: none;
+    color: inherit;
+    padding: 2.5rem 2.5rem 1.5rem 2.5rem;
+    text-align: center; 
+}
+
 .card-icon {
     font-size: 4rem;
     margin-bottom: 1.5rem;
-    color: var(--color-text-light);
 }
 
-/* Título de la tarjeta (Módulo X) */
 .card-caption {
-    font-family: 'Roboto', sans-serif;
     font-size: 2rem;
     font-weight: 900;
-    margin: 0;
     text-transform: uppercase;
-    color: var(--color-text-light);
 }
 
-/* Descripción de la tarjeta */
 .card-description {
-    font-family: 'Roboto', sans-serif;
     font-size: 1.1rem;
     margin-top: 0.5rem;
-    color: var(--color-text-light);
-    text-align: center;
 }
 
-/* === RESPONSIVE: Móviles y tabletas pequeñas === */
-@media (max-width: 768px) {
-    .boosters-title {
-        font-size: 2rem;
-    }
-
-    .subject-cards-grid {
-        /* En pantallas pequeñas, las tarjetas se apilan verticalmente */
-        grid-template-columns: 1fr;
-    }
-
-    .welcome-message {
-        display: none; /* Oculta el mensaje en pantallas pequeñas para dar espacio */
-    }
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* --------- NUEVO: Menú Desplegable de Configuración --------- */
+.card-actions .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.card-actions .btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Menú Desplegable --- */
 .user-menu .dropdown {
-    position: relative; /* Contenedor para el menú */
+    position: relative;
 }
-
-/* --------- NUEVO: Botón Desplegable con Contraste y Borde Primario --------- */
 
 .dropdown-btn {
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    
-    /* Fondo blanco limpio y borde sutil (estado normal) */
     background-color: var(--card); 
     border: 1px solid var(--card-brd);
-    
     padding: 0.6rem 1.2rem;
     border-radius: var(--radius);
     font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--ink); /* Texto principal (oscuro) */
-    
-    box-shadow: 0 4px 8px rgba(17, 24, 39, 0.05); /* Sombra muy sutil */
-    
+    color: var(--ink);
+    box-shadow: 0 4px 8px rgba(17, 24, 39, 0.05);
     transition: all .25s ease-out;
 }
 
 .dropdown-btn:hover {
-    /* Al hacer hover: Destacamos con el color Primario */
-    background-color: var(--card); /* Mantiene el fondo blanco */
-    color: var(--primary); /* El texto se vuelve rojo primario */
-    border-color: var(--primary); /* El borde se vuelve rojo primario */
-    
-    /* Animación: Se levanta ligeramente, como un interruptor */
+    color: var(--primary);
+    border-color: var(--primary);
     transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(107, 233, 255, 0.15); /* Sombra que insinúa el color de acento */
 }
+
 .dropdown-btn svg {
     transition: transform 0.2s;
 }
 
-/* Gira la flecha cuando el menú está abierto */
 .dropdown-btn.open svg {
     transform: rotate(180deg);
 }
 
 .dropdown-content {
-    display: none; /* Oculto por defecto */
+    display: none;
     position: absolute;
     right: 0;
-    top: calc(100% + 10px); /* Espacio entre el botón y el menú */
+    top: calc(100% + 10px);
     min-width: 180px;
     background-color: var(--card);
     border-radius: var(--radius);
-    border: 1px solid var(--card-brd);
     box-shadow: var(--shadow);
     z-index: 100;
-    overflow: hidden;
     animation: fadeIn .2s ease-out;
 }
 
@@ -282,7 +229,7 @@ body::before{
 }
 
 .dropdown-content.show {
-    display: block; /* Muestra el menú */
+    display: block;
 }
 
 .dropdown-content a {
@@ -290,11 +237,144 @@ body::before{
     padding: 0.8rem 1.2rem;
     color: var(--ink-soft);
     text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.2s, color 0.2s;
 }
 
 .dropdown-content a:hover {
     background-color: #f3f4f6;
     color: var(--ink);
 }
+
+/* --- Modal --- */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none; /* Se activa con JS */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    animation: slideInModal 0.4s ease-out;
+}
+
+@keyframes slideInModal {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-brd);
+}
+
+#modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.close-btn {
+    font-size: 2rem;
+    color: var(--muted);
+    cursor: pointer;
+    line-height: 1;
+}
+
+#course-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#course-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-align: left;
+}
+
+#course-form input, #course-form textarea {
+    width: 100%;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--card-brd);
+    border-radius: var(--radius);
+    font-size: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+
+/* --- Botones Generales --- */
+.btn {
+    padding: 0.8rem 1.8rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: #e54b4b;
+    color: #fff;
+}
+
+
+/* --- Toasts --- */
+#message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.toast {
+    background-color: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    animation: slideInToast 0.5s forwards, fadeOutToast 0.5s 2.5s forwards;
+}
+.toast--error {
+    background-color: #dc3545;
+}
+@keyframes slideInToast { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeOutToast { from { opacity: 1; } to { opacity: 0; } }
+
+/* --- Vista de Perfil --- */
+#profile-view {
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-lg);
+}
+
