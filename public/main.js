@@ -1,97 +1,55 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM cargado. Iniciando script...');
 
-    // --- Elementos del DOM ---
-    const mainContent = document.getElementById('main-content');
-    const profileView = document.getElementById('profile-view');
-    const welcomeMessageContainer = document.getElementById('welcome-message');
-    const messageContainer = document.getElementById('message-container') || document.body;
+    // --- DECODIFICADOR DE JWT Y AUTENTICACIÓN ---
+    function decodeJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error("Error fatal al decodificar JWT:", e);
+            localStorage.clear();
+            window.location.href = 'index.html';
+            return null;
+        }
+    }
 
-    // --- Menú de Configuración y Perfil ---
-    const settingsButton = document.getElementById('settings-btn');
-    const dropdownContent = document.getElementById('dropdown-content');
-    const profileLink = document.getElementById('profile-link');
-    const closeProfileBtn = document.getElementById('close-profile-btn');
-    const profileForm = document.getElementById('profile-form');
-    const logoutButton = document.getElementById('logout-button');
-    const profileEmailInput = document.getElementById('profile-email');
-    const profileUsernameInput = document.getElementById('profile-username');
-    const profilePhoneInput = document.getElementById('profile-phone');
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        console.log('No se encontró token. Redirigiendo a index.html');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const decodedToken = decodeJwt(token);
+    console.log('Token decodificado:', decodedToken);
+
+    const userRole = decodedToken ? decodedToken.role : 'student';
+    const isAdmin = userRole === 'admin';
+    const userId = decodedToken ? decodedToken.sub : null;
+    console.log(`Rol: ${userRole}, Admin: ${isAdmin}, ID: ${userId}`);
 
     const currentUserEmail = localStorage.getItem('user_email');
 
-    // --- Funciones de Perfil y Bienvenida ---
-    function displayWelcomeMessage() {
-        if (!currentUserEmail || !welcomeMessageContainer) return;
-        const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
-        const username = userProfileString ? (JSON.parse(userProfileString).username || '') : '';
-        welcomeMessageContainer.innerHTML = username ? `👋🏼 Bienvenido, <strong>${username}</strong>` : '👋🏼 ¡Bienvenido!';
-    }
+    const authHeaders = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
 
-    function loadProfileData() {
-        if (!currentUserEmail) return;
-        profileEmailInput.value = currentUserEmail;
-        const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
-        if (userProfileString) {
-            const userProfile = JSON.parse(userProfileString);
-            profileUsernameInput.value = userProfile.username || '';
-            profilePhoneInput.value = userProfile.phone || '';
-        }
-    }
-
-    if (profileForm) {
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!currentUserEmail) return;
-            const userProfile = { username: profileUsernameInput.value, phone: profilePhoneInput.value };
-            localStorage.setItem(`profile_${currentUserEmail}`, JSON.stringify(userProfile));
-            showMessage('¡Perfil guardado con éxito!');
-            displayWelcomeMessage(); // Actualiza el saludo
-        });
-    }
-
-    if (settingsButton) {
-        settingsButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            dropdownContent.classList.toggle('show');
-            settingsButton.classList.toggle('open');
-        });
-    }
-
-    window.addEventListener('click', () => {
-        if (dropdownContent && dropdownContent.classList.contains('show')) {
-            dropdownContent.classList.remove('show');
-            if(settingsButton) settingsButton.classList.remove('open');
-        }
-    });
-
-    if (profileLink) {
-        profileLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            mainContent.style.display = 'none';
-            profileView.style.display = 'block';
-            loadProfileData();
-            dropdownContent.classList.remove('show');
-        });
-    }
-
-    if (closeProfileBtn) {
-        closeProfileBtn.addEventListener('click', () => {
-            profileView.style.display = 'none';
-            mainContent.style.display = 'block';
-        });
-    }
-    
-    if(logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('user_email');
-            window.location.href = 'index.html';
-        });
-    }
-
-    // --- Lógica del Modal de Cursos (Crear/Editar) ---
-    const courseModal = document.getElementById('course-modal');
+    // --- ELEMENTOS DEL DOM ---
+    const welcomeMessageContainer = document.getElementById('welcome-message');
+    const settingsButton = document.getElementById('settings-btn');
+    const dropdownContent = document.getElementById('dropdown-content');
+    const logoutButton = document.getElementById('logout-button');
     const addCourseBtn = document.getElementById('add-course-btn');
+    const grid = document.querySelector('.subject-cards-grid');
+    
+    // Vistas y Modales de Curso
+    const courseModal = document.getElementById('course-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const courseForm = document.getElementById('course-form');
     const modalTitle = document.getElementById('modal-title');
@@ -99,140 +57,254 @@ document.addEventListener('DOMContentLoaded', () => {
     const courseNameInput = document.getElementById('course-name');
     const courseDescriptionInput = document.getElementById('course-description');
     
-    let cursosCache = []; 
+    // Vistas y Modales de Perfil
+    const profileLink = document.getElementById('profile-link');
+    const profileView = document.getElementById('profile-view');
+    const closeProfileBtn = document.getElementById('close-profile-btn');
+    const profileForm = document.getElementById('profile-form');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profileUsernameInput = document.getElementById('profile-username');
+    const profilePhoneInput = document.getElementById('profile-phone');
 
-    if (addCourseBtn) {
-        addCourseBtn.addEventListener('click', () => {
-            courseForm.reset();
-            courseIdInput.value = '';
-            modalTitle.textContent = 'Crear Nuevo Curso';
-            courseModal.style.display = 'flex';
-        });
+    let cursosCache = [];
+
+    // --- FUNCIONES PRINCIPALES ---
+
+    function displayWelcomeMessage() {
+        if (!currentUserEmail || !welcomeMessageContainer) return;
+        const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
+        let username = currentUserEmail.split('@')[0];
+        if (userProfileString) {
+            username = JSON.parse(userProfileString).username || username;
+        }
+        welcomeMessageContainer.innerHTML = `👋🏼 Bienvenido, <strong>${username}</strong>`;
     }
 
-    const closeCourseModal = () => {
-        if(courseModal) courseModal.style.display = 'none';
-    };
-
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeCourseModal);
-    window.addEventListener('click', (event) => {
-        if (event.target === courseModal) closeCourseModal();
-    });
-
-    if (courseForm) {
-        courseForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = courseIdInput.value;
-            const url = id ? `/cursos/${id}` : '/cursos';
-            const method = id ? 'PATCH' : 'POST';
-
-            const courseData = { nombre: courseNameInput.value, descripcion: courseDescriptionInput.value };
-
-            try {
-                const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(courseData) });
-                if (!response.ok) throw new Error('La petición falló');
-                
-                showMessage(`¡Curso ${id ? 'actualizado' : 'creado'} con éxito!`);
-                closeCourseModal();
-                cargarCursos(); 
-
-            } catch (error) {
-                showMessage(`Error al ${id ? 'actualizar' : 'crear'} el curso`, true);
-            }
-        });
-    }
-
-    // --- Cargar y Mostrar Cursos ---
-    async function cargarCursos() {
-        const grid = document.querySelector('.subject-cards-grid');
-        if (!grid) return;
-
-        try {
-            const response = await fetch('/cursos');
-            if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-            cursosCache = await response.json();
-
-            grid.innerHTML = ''; 
-            if (cursosCache.length === 0) {
-                grid.innerHTML = '<p>No hay cursos disponibles. ¡Crea el primero!</p>';
-                return;
-            }
-            
-            const icons = ['fas fa-book-open', 'fas fa-atom', 'fas fa-palette', 'fas fa-laptop-code'];
-            cursosCache.forEach((curso, index) => {
-                const card = document.createElement('div');
-                card.className = 'subject-card';
-                const iconClass = icons[index % icons.length];
-
-                card.innerHTML = `
-                    <a href="#" class="card-content-link" data-curso-id="${curso._id}">
-                        <div class="card-icon"><i class="${iconClass}"></i></div>
-                        <h3 class="card-caption">${curso.nombre}</h3>
-                        <p class="card-description">${curso.descripcion}</p>
-                    </a>
-                    <div class="card-actions">
-                        <button class="btn btn-edit" data-id="${curso._id}">Editar</button>
-                        <button class="btn btn-delete" data-id="${curso._id}">Eliminar</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-
-        } catch (error) {
-            grid.innerHTML = '<p>Hubo un error al cargar los cursos.</p>';
+    function setupAdminControls() {
+        if (addCourseBtn && isAdmin) {
+            addCourseBtn.style.display = 'block';
+        } else if(addCourseBtn) {
+            addCourseBtn.style.display = 'none';
         }
     }
 
-    // --- Delegación de Eventos para Tarjetas ---
-    const subjectGrid = document.querySelector('.subject-cards-grid');
-    if(subjectGrid) {
-        subjectGrid.addEventListener('click', async (e) => {
-            const target = e.target;
+    async function cargarCursos() {
+        if (!grid) return;
+        grid.innerHTML = ''; 
+
+        try {
+            let cursosParaMostrar = [];
+            if (isAdmin) {
+                // Si es admin, obtiene todos los cursos.
+                const response = await fetch('/cursos', { headers: authHeaders });
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                cursosCache = await response.json(); // Guardamos en caché para editar/eliminar
+                cursosParaMostrar = cursosCache;
+            } else {
+                // Si es estudiante, obtiene solo sus cursos desde su perfil.
+                if (!userId) throw new Error('No se pudo obtener el ID del usuario.');
+                const response = await fetch(`/usuarios/${userId}`, { headers: authHeaders });
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const usuario = await response.json();
+                // El backend ya popula los cursos, así que `usuario.cursos` es la lista que necesitamos.
+                cursosParaMostrar = usuario.cursos || []; 
+            }
+
+            if (cursosParaMostrar.length === 0) {
+                grid.innerHTML = isAdmin 
+                    ? '<p class="empty-grid-message">No hay cursos disponibles. ¡Crea el primero para empezar!</p>' 
+                    : '<p class="empty-grid-message">Aún no estás inscrito en ningún curso.</p>';
+                return;
+            }
             
-            if (target.closest('.btn-edit')) {
-                const id = target.closest('.btn-edit').dataset.id;
-                const cursoAEditar = cursosCache.find(c => c._id === id);
-                if (!cursoAEditar) return;
+            renderizarTarjetas(cursosParaMostrar);
 
-                courseIdInput.value = cursoAEditar._id;
-                courseNameInput.value = cursoAEditar.nombre;
-                courseDescriptionInput.value = cursoAEditar.descripcion;
-                modalTitle.textContent = 'Editar Curso';
-                courseModal.style.display = 'flex';
-            }
+        } catch (error) {
+            console.error("Error al cargar cursos:", error);
+            grid.innerHTML = '<p class="empty-grid-message">Hubo un error al cargar los cursos. Por favor, intenta de nuevo más tarde.</p>';
+        }
+    }
 
-            else if (target.closest('.btn-delete')) {
-                const id = target.closest('.btn-delete').dataset.id;
-                if (!confirm('¿Estás seguro de que quieres eliminar este curso?')) return;
 
-                try {
-                    const response = await fetch(`/cursos/${id}`, { method: 'DELETE' });
-                    if (!response.ok) throw new Error('La petición de borrado falló');
-                    showMessage('Curso eliminado con éxito.');
-                    cargarCursos();
-                } catch (error) {
-                    showMessage('No se pudo eliminar el curso.', true);
-                }
-            }
+    function renderizarTarjetas(cursos) {
+        const icons = ['fas fa-book-open', 'fas fa-atom', 'fas fa-palette', 'fas fa-laptop-code'];
+        grid.innerHTML = ''; // Limpiamos el grid antes de renderizar
+        cursos.forEach((curso, index) => {
+            if (!curso) return; 
+            const card = document.createElement('div');
+            card.className = 'subject-card';
+            const iconClass = icons[index % icons.length];
+            // Solo los admins pueden ver los botones de editar y eliminar
+            const adminActions = isAdmin ? `
+                <div class="card-actions">
+                    <button class="btn btn-edit" data-id="${curso._id}">Editar</button>
+                    <button class="btn btn-delete" data-id="${curso._id}">Eliminar</button>
+                </div>
+            ` : '';
 
-            else if (target.closest('.card-content-link')) {
-                e.preventDefault();
-                const cursoId = target.closest('.card-content-link').dataset.cursoId;
-                window.location.href = `modulo1.html?cursoId=${cursoId}`;
-            }
+            card.innerHTML = `
+                <a href="modulo1.html?cursoId=${curso._id}" class="card-content-link">
+                    <div class="card-icon"><i class="${iconClass}"></i></div>
+                    <h3 class="card-caption">${curso.nombre}</h3>
+                    <p class="card-description">${curso.descripcion}</p>
+                </a>
+                ${adminActions}
+            `;
+            grid.appendChild(card);
         });
     }
-    
-    // --- Toast para mensajes ---
-    function showMessage(message, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = `toast ${isError ? 'toast--error' : ''}`.trim();
-        toast.textContent = message;
-        messageContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+
+    // --- MANEJADORES DE EVENTOS ---
+
+    function setupEventListeners() {
+        // Dropdown de configuración
+        if (settingsButton) {
+            settingsButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+        }
+
+        // Logout
+        if (logoutButton) {
+            logoutButton.addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+        }
+        
+        // Abrir Modal para CREAR curso
+        if(addCourseBtn && isAdmin) {
+            addCourseBtn.addEventListener('click', () => {
+                courseForm.reset();
+                courseIdInput.value = '';
+                modalTitle.textContent = 'Crear Nuevo Curso';
+                courseModal.style.display = 'flex';
+            });
+        }
+
+        // Clics en tarjetas de curso (EDITAR/ELIMINAR)
+        if (grid) {
+            grid.addEventListener('click', (e) => {
+                const editButton = e.target.closest('.btn-edit');
+                const deleteButton = e.target.closest('.btn-delete');
+
+                if (isAdmin && editButton) {
+                    const id = editButton.dataset.id;
+                    const curso = cursosCache.find(c => c._id === id);
+                    if (curso) {
+                        courseIdInput.value = curso._id;
+                        courseNameInput.value = curso.nombre;
+                        courseDescriptionInput.value = curso.descripcion;
+                        modalTitle.textContent = 'Editar Curso';
+                        courseModal.style.display = 'flex';
+                    }
+                } else if (isAdmin && deleteButton) {
+                    const id = deleteButton.dataset.id;
+                    if (confirm('¿Seguro que quieres eliminar este curso?')) {
+                        fetch(`/cursos/${id}`, { method: 'DELETE', headers: authHeaders })
+                            .then(res => {
+                                if(!res.ok) throw new Error('Error en el borrado');
+                                cargarCursos(); // Recargamos los cursos
+                            })
+                            .catch(err => console.error('Fallo al eliminar', err));
+                    }
+                }
+            });
+        }
+
+        // Cerrar modal de CURSO
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => courseModal.style.display = 'none');
+        }
+
+        // Enviar formulario de CURSO (crear/editar)
+        if (courseForm) {
+            courseForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = courseIdInput.value;
+                const url = id ? `/cursos/${id}` : '/cursos';
+                const method = id ? 'PATCH' : 'POST';
+                const courseData = { nombre: courseNameInput.value, descripcion: courseDescriptionInput.value };
+                try {
+                    const res = await fetch(url, { method, headers: authHeaders, body: JSON.stringify(courseData) });
+                    if (!res.ok) throw new Error('La petición al servidor falló');
+                    closeModalBtn.click();
+                    await cargarCursos();
+                } catch (err) {
+                    console.error('Error al guardar curso:', err);
+                }
+            });
+        }
+        
+        // --- LÓGICA DE PERFIL ---
+        
+        // Abrir modal de PERFIL
+        if (profileLink) {
+            profileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (currentUserEmail && profileEmailInput) {
+                    profileEmailInput.value = currentUserEmail;
+                }
+                const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
+                if (userProfileString) {
+                    const profile = JSON.parse(userProfileString);
+                    if (profileUsernameInput) profileUsernameInput.value = profile.username || '';
+                    if (profilePhoneInput) profilePhoneInput.value = profile.phone || '';
+                } else {
+                    if (profileUsernameInput) profileUsernameInput.value = decodedToken.username || currentUserEmail.split('@')[0];
+                    if (profilePhoneInput) profilePhoneInput.value = '';
+                }
+                
+                if (profileView) profileView.style.display = 'flex';
+                if (dropdownContent) dropdownContent.classList.remove('show');
+            });
+        }
+
+        // Cerrar modal de PERFIL
+        if (closeProfileBtn) {
+            closeProfileBtn.addEventListener('click', () => {
+                if (profileView) profileView.style.display = 'none';
+            });
+        }
+        
+        // Guardar formulario de PERFIL
+        if (profileForm) {
+            profileForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = profileUsernameInput.value;
+                const phone = profilePhoneInput.value;
+                const profileData = { username, phone };
+                localStorage.setItem(`profile_${currentUserEmail}`, JSON.stringify(profileData));
+                
+                displayWelcomeMessage(); 
+                if (profileView) profileView.style.display = 'none';
+
+                const msgContainer = document.getElementById('message-container');
+                if (msgContainer) {
+                    const toast = document.createElement('div');
+                    toast.className = 'toast';
+                    toast.textContent = 'Perfil actualizado con éxito.';
+                    msgContainer.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                }
+            });
+        }
+
+        // Cierre global de modales y dropdowns
+        window.addEventListener('click', (e) => {
+            if (dropdownContent && !settingsButton.contains(e.target) && !dropdownContent.contains(e.target)) {
+                dropdownContent.classList.remove('show');
+            }
+            if(e.target === courseModal) courseModal.style.display = 'none';
+            if(e.target === profileView) profileView.style.display = 'none';
+        });
     }
 
-    // --- INICIALIZACIÓN ---
+    // --- SECUENCIA DE INICIALIZACIÓN ---
     displayWelcomeMessage();
+    setupAdminControls();
     cargarCursos();
+    setupEventListeners();
 });

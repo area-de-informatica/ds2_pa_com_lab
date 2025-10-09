@@ -1,8 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UnidadesService } from './unidades.service';
 import { CreateUnidadesDto } from './dto/create-unidade.dto';
 import { UpdateUnidadesDto } from './dto/update-unidade.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../Usuarios/schemas/usuarios.schema';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles(Role.ADMIN)
 @Controller('unidades')
 export class UnidadesController {
   constructor(private readonly unidadesService: UnidadesService) {}

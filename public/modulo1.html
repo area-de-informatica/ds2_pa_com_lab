@@ -6,8 +6,7 @@
     <title>Módulo</title>
 
     <script>
-        const token = localStorage.getItem('access_token');
-        if (!token) {
+        if (!localStorage.getItem('access_token')) {
             window.location.replace('index.html'); 
         }
     </script>
@@ -23,65 +22,70 @@
     <div class="site-wrapper">
         <header class="main-header">
             <a href="main.html" class="logo">Complab</a>
-            
             <div class="user-menu">
+                <span id="welcome-message" class="welcome-message"></span>
                 <div class="dropdown">
                     <button id="settings-btn" class="dropdown-btn">
                         <span>Configuración</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-                        </svg>
+                        <i class="fas fa-chevron-down"></i>
                     </button>
                     <div id="dropdown-content" class="dropdown-content">
                         <a href="#" id="profile-link">Mi Perfil</a>
-                        <a href="#" id="logout-button">Cerrar sesión</a>
+                        <a href="#" id="logout-button">Cerrar Sesión</a>
                     </div>
                 </div>
             </div>
         </header>
 
         <main class="main-content">
-            <section class="boosters-section">
-                <h1 id="module-title" class="boosters-title"></h1>
+            <section class="module-section">
+                <h1 id="module-title" class="boosters-title">Cargando...</h1>
                 <div class="title-underline"></div> 
 
-                <p id="module-content"></p>
+                <div class="tabs-container">
+                    <nav id="admin-tab-nav" class="tab-nav" style="display: none;">
+                        <button class="tab-link active" data-tab="content-view">Contenido</button>
+                        <button class="tab-link" data-tab="participants-view">Participantes</button>
+                    </nav>
+                </div>
+
+                <div id="tab-content-container">
+
+                    <!-- Pestaña 1: Contenido del Curso -->
+                    <div id="content-view" class="tab-pane active">
+                        <p id="module-content"></p>
+                        <div class="course-content-section">
+                            <h2 class="section-title">Contenido del Curso</h2>
+                            <div id="course-units-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña 2: Panel de Administración (Participantes) -->
+                    <div id="participants-view" class="tab-pane">
+                        <div class="admin-panel">
+                            <div class="admin-column">
+                                <h2 class="section-title">Estudiantes Inscritos</h2>
+                                <div id="lista-estudiantes" class="student-list-container"></div>
+                            </div>
+                            <div class="admin-column">
+                                <h2 class="section-title">Inscribir Estudiante</h2>
+                                <form id="form-inscribir" class="enroll-form card-like">
+                                    <div class="form-group">
+                                        <label for="usuarioId">ID del Estudiante</label>
+                                        <input type="text" id="usuarioId" name="usuarioId" placeholder="Pega el ID del usuario aquí" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Inscribir</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </section>
         </main>
+        <div id="message-container"></div>
     </div>
 
-    <script src="main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const cursoId = urlParams.get('cursoId');
-
-            const moduleTitle = document.getElementById('module-title');
-            const moduleContent = document.getElementById('module-content');
-            
-            if (!cursoId) {
-                moduleTitle.textContent = 'Error';
-                moduleContent.textContent = 'No se ha especificado un ID de curso.';
-                return;
-            }
-
-            try {
-                const response = await fetch(`/cursos/${cursoId}`);
-                if (!response.ok) {
-                    throw new Error('No se pudo cargar la información del curso.');
-                }
-                const curso = await response.json();
-                
-                // Update page content
-                document.title = `Módulo: ${curso.nombre}`;
-                moduleTitle.textContent = `MÓDULO: ${curso.nombre.toUpperCase()}`;
-                moduleContent.textContent = curso.descripcion;
-
-            } catch (error) {
-                moduleTitle.textContent = 'Error al cargar';
-                moduleContent.textContent = error.message;
-            }
-        });
-    </script>
+    <script src="modulo.js"></script>
 </body>
 </html>

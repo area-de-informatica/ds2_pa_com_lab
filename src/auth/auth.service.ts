@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsuariosService } from '../Usuarios/usuarios.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUsuarioDto } from '../Usuarios/dto/create-usuario.dto';
+import { Role } from '../Usuarios/schemas/usuarios.schema'; // Importar el Enum de Roles
 
 @Injectable()
 export class AuthService {
@@ -12,28 +13,28 @@ export class AuthService {
   ) {}
 
   async register(createUsuarioDto: CreateUsuarioDto) {
-    // CORREGIDO: Extraemos el 'phone' del DTO
     const { username, email, password, phone } = createUsuarioDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // CORREGIDO: Añadimos el 'phone' al objeto que se va a crear
+    // Lógica para asignar el rol basado en el email
+    const role = email === 'admin@gmail.com' ? Role.ADMIN : Role.STUDENT;
+
     const userToCreate = {
       username,
       email,
       password: hashedPassword,
-      phone, // Se pasa el teléfono al servicio de usuarios
+      phone,
+      role, // Asignar el rol al objeto del usuario
     };
 
-    // El DTO aquí es solo para el tipado, el objeto ya tiene la estructura correcta
     const newUser = await this.usuariosService.create(userToCreate as CreateUsuarioDto);
     
-    // Asumiendo que el servicio de usuarios devuelve un objeto con un método toObject()
     if (newUser && typeof newUser.toObject === 'function') {
       const { password: _, ...userWithoutPassword } = newUser.toObject();
       return userWithoutPassword;
     }
     
-    return newUser; // Fallback por si no viene como se espera
+    return newUser;
   }
 
   async login(email: string, passwordLogin: string) {
@@ -42,7 +43,8 @@ export class AuthService {
     if (user) {
         const isPasswordMatching = await bcrypt.compare(passwordLogin, user.password);
         if (isPasswordMatching) {
-            const payload = { email: user.email, sub: user._id };
+            // Añadir el rol al payload del token JWT
+            const payload = { email: user.email, sub: user._id, role: user.role };
             return {
                 access_token: this.jwtService.sign(payload),
             };

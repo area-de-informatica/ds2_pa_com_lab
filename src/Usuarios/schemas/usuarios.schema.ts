@@ -4,10 +4,15 @@ import { Document } from 'mongoose';
 import { Curso } from '../../Cursos/schemas/cursos.schema'
 import { Entrega } from '../../Entregas/schemas/entregas.schema'
 
+// Definimos los roles permitidos usando un Enum
+export enum Role {
+  ADMIN = 'admin',
+  STUDENT = 'student',
+}
+
 @Schema({
     timestamps: true
 })
-
 export class Usuario extends Document{
     @Prop()
     username: string;
@@ -15,8 +20,9 @@ export class Usuario extends Document{
     @Prop({ unique: [true, 'Email already exists'] })
     email: string;
 
-    @Prop({default: 'guest'})
-    role: string;
+    // Usamos el Enum para el tipo y establecemos un valor por defecto
+    @Prop({ type: String, enum: Role, default: Role.STUDENT })
+    role: Role;
     
     @Prop()
     phone: string;
