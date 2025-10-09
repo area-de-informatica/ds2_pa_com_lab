@@ -523,3 +523,133 @@ body{
     font-weight: 700;
     margin-bottom: 1.5rem;
 }
+
+/* --------- Estructura del Módulo de Curso (Dos Columnas) --------- */
+
+.course-layout {
+    display: flex;
+    gap: 2.5rem; /* Espacio entre la barra lateral y el contenido */
+    align-items: flex-start; /* Alinea los items al inicio */
+}
+
+.course-index-sidebar {
+    flex: 0 0 300px; /* No crece, no se encoge, base de 300px */
+    background-color: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-brd);
+}
+
+#units-list-container {
+    margin-bottom: 1.5rem;
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: var(--ink-soft);
+    border: 1px solid var(--card-brd);
+}
+
+.btn-secondary:hover {
+    background-color: #e9ecef;
+    color: var(--ink);
+}
+
+.btn-full-width {
+    width: 100%;
+}
+
+.course-content-area {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    background-color: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    min-height: 400px; /* Altura mínima para que se vea bien */
+}
+
+#unit-content-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.add-content-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--card-brd);
+}
+
+/* Estilo para los elementos de la unidad en la barra lateral */
+.unit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius);
+    text-align: left;
+    background-color: #f3f4f6;
+    border: 1px solid #f3f4f6;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.unit-item:hover {
+    background-color: #e9ecef;
+    border-color: var(--accent);
+}
+
+.unit-item.active {
+    background-color: var(--primary);
+    color: var(--color-text-light);
+    font-weight: 700;
+    border-color: var(--primary);
+}
+
+.unit-item-actions {
+    display: none;
+    gap: 0.5rem;
+}
+
+.unit-item.active .unit-item-actions,
+.unit-item:hover .unit-item-actions {
+    display: flex;
+}
+
+.unit-item-actions button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.2rem;
+}
+
+.unit-item.active .unit-item-actions button {
+    color: white;
+}
+
+.unit-item-actions button:hover {
+    color: var(--ink);
+}
+
+.unit-item.active .unit-item-actions button:hover {
+    color: #ffd166;
+}
+

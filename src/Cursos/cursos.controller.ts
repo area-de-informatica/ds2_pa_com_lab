@@ -8,13 +8,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../Usuarios/schemas/usuarios.schema';
+import { CreateUnidadesDto } from '../Unidades/dto/create-unidade.dto';
 
 @Controller('cursos')
 export class CursosController {
   constructor(private readonly cursosService: CursosService) {}
 
-  // POST /cursos
-  // Crea un nuevo curso. (Solo para Admins)
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
@@ -23,16 +22,34 @@ export class CursosController {
     return this.cursosService.create(createCursoDto);
   }
 
-  // GET /cursos
-  // Devuelve una lista de todos los cursos. (Para todos los usuarios autenticados)
   @Get()
   @UseGuards(AuthGuard('jwt'))
   findAll() {
     return this.cursosService.findAll();
   }
+    
+  @Post(':id/unidades')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  createUnidad(
+    @Param('id') cursoId: string,
+    @Body() createUnidadeDto: CreateUnidadesDto,
+  ) {
+    return this.cursosService.createUnidadForCurso(cursoId, createUnidadeDto);
+  }
 
-  // POST /cursos/:cursoId/inscribir
-  // Inscribe a un usuario en un curso. (Solo para Admins)
+  // **** ¡NUEVO! Endpoint para eliminar una unidad de un curso ****
+  @Delete(':cursoId/unidades/:unidadId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  deleteUnidad(
+    @Param('cursoId') cursoId: string,
+    @Param('unidadId') unidadId: string,
+  ) {
+    return this.cursosService.deleteUnidadFromCurso(cursoId, unidadId);
+  }
+
   @Post(':cursoId/inscribir')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
@@ -48,16 +65,12 @@ export class CursosController {
     return this.cursosService.eliminarEstudiante(cursoId, inscribirUsuarioDto.usuarioId);
   }
 
-  // GET /cursos/:id
-  // Devuelve un curso específico. (Para todos los usuarios autenticados)
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   findOne(@Param('id') id: string) {
     return this.cursosService.findOne(id);
   }
 
-  // PATCH /cursos/:id
-  // Actualiza un curso. (Solo para Admins)
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
@@ -66,8 +79,6 @@ export class CursosController {
     return this.cursosService.update(id, updateCursoDto);
   }
 
-  // DELETE /cursos/:id
-  // Elimina un curso. (Solo para Admins)
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
