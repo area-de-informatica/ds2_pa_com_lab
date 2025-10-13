@@ -275,20 +275,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     function loadUnitContent(unitId, unidades) {
         const unit = unidades.find(u => u._id === unitId);
         if (!unit) return;
-
+    
         unitContentPlaceholder.style.display = 'none';
         unitContentDisplay.style.display = 'block';
         
         document.getElementById('unit-title-display').textContent = unit.name;
         document.getElementById('lessons-and-activities-container').innerHTML = '<p>Aquí se mostrarán las lecciones y actividades de esta unidad.</p>';
         
-        const addContentButtons = document.querySelector('.add-content-buttons');
+        const addContentButtons = document.querySelector('.unit-actions');
         if (addContentButtons) {
             addContentButtons.style.display = isAdmin ? 'flex' : 'none';
         }
         
-        document.getElementById('add-lesson-btn').onclick = () => showMessage('Añadir lección: próximamente.');
-        document.getElementById('add-activity-btn').onclick = () => showMessage('Añadir actividad: próximamente.');
+        document.getElementById('add-lesson-btn').onclick = () => showMessage('Añadir Lección', true);
+        document.getElementById('add-activity-btn').onclick = () => showMessage('Añadir Actividad', true);
     }
 
     // --- 6. PESTAÑA "PARTICIPANTES" ---
