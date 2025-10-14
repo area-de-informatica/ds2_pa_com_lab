@@ -1,5 +1,6 @@
+
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Módulo.js v10 - Control de roles de usuario");
+    console.log("Módulo.js v26 - Eliminando TinyMCE");
 
     // --- 1. ESTADO CENTRAL Y AUTENTICACIÓN ---
     let state = {
@@ -7,18 +8,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         editMode: false,
         currentUnitId: null
     };
-
+    // ... (código de autenticación existente) ...
     function decodeJwt(token) {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
             return JSON.parse(jsonPayload);
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
-
     const token = localStorage.getItem('access_token');
     const decodedToken = decodeJwt(token);
     if (!token || !decodedToken) {
@@ -26,15 +24,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.replace('index.html');
         return;
     }
-
     const userRole = decodedToken.role;
     const userId = decodedToken.sub;
     const isAdmin = userRole === 'admin';
     const cursoId = new URLSearchParams(window.location.search).get('cursoId');
-    const authHeaders = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    };
+    const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    const authHeadersForFiles = { 'Authorization': `Bearer ${token}` };
 
     // --- 2. REFERENCIAS AL DOM ---
     const mainContent = document.querySelector('.main-content');
@@ -48,8 +43,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const unitsListContainer = document.getElementById('units-list-container');
     const unitContentPlaceholder = document.getElementById('unit-content-placeholder');
     const unitContentDisplay = document.getElementById('unit-content-display');
+    const lessonsContainer = document.getElementById('lessons-and-activities-container');
+    const activityFormModal = document.getElementById('activity-form-modal');
+    const activityModalTitle = document.getElementById('activity-modal-title');
+    const activityFormContainer = document.getElementById('activity-form-container');
 
     // --- 3. INICIALIZACIÓN PRINCIPAL ---
+    // ... (código de inicialización existente) ...
     if (!cursoId) {
         mainContent.innerHTML = '<h1>Error: No se ha especificado un curso.</h1><a href="main.html" class="btn">Volver</a>';
         return;
@@ -77,16 +77,187 @@ document.addEventListener('DOMContentLoaded', async () => {
     function initializePage(curso) {
         initializeHeader(curso);
         if (isAdmin) {
-            initializeAdminTabs(curso);
-            initializeUnitModal();
+            initializeAdminFunctionality(curso);
         } else {
             const addUnitBtn = document.getElementById('add-unit-btn');
             if (addUnitBtn) addUnitBtn.style.display = 'none';
         }
         initializeCourseContentView(curso);
     }
+    
+    function initializeAdminFunctionality(curso) {
+        initializeAdminTabs(curso);
+        initializeUnitModal();
+        
+        document.addEventListener('add-resource', (e) => {
+            const { type } = e.detail;
+            if (!state.currentUnitId) {
+                showMessage('Por favor, selecciona una unidad primero.', true);
+                return;
+            }
+            openActivityModal(type);
+        });
 
-    function initializeHeader(curso) {
+        const closeActivityModalBtn = document.getElementById('close-activity-modal-btn');
+        closeActivityModalBtn.addEventListener('click', () => activityFormModal.style.display = 'none');
+        activityFormModal.addEventListener('click', e => {
+            if (e.target === activityFormModal) activityFormModal.style.display = 'none';
+        });
+    }
+
+    function openActivityModal(type) {
+        activityFormModal.style.display = 'flex';
+        let formHTML = '';
+        
+        if (type === 'file') {
+            activityModalTitle.textContent = 'Añadiendo un nuevo Archivo';
+            formHTML = createFileFormHTML();
+        } else if (type === 'lesson') {
+            activityModalTitle.textContent = 'Añadiendo un Área de texto y medios';
+            formHTML = ``; // Próximamente
+        } else if (type === 'activity') {
+            activityModalTitle.textContent = 'Añadiendo un nuevo Foro';
+            formHTML = ``; // Próximamente
+        }
+        
+        activityFormContainer.innerHTML = formHTML;
+        
+        if (type === 'file') {
+            setupFileFormLogic();
+        }
+    }
+
+    function createFileFormHTML() {
+        return `
+            <form id="advanced-file-form" class="activity-form">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="file-name">Nombre</label>
+                        <input type="text" id="file-name" name="name" placeholder="Ej: Guía de Repaso 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="file-description">Descripción</label>
+                        <textarea id="file-description" name="description" placeholder="Añade una descripción detallada para este recurso..." rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="form-section">
+                     <label>Seleccionar archivos</label>
+                    <div id="file-drop-zone" class="file-drop-zone">
+                        <div class="file-drop-zone-internal">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Puede arrastrar y soltar archivos aquí para añadirlos.</p>
+                            <input type="file" id="file-input-hidden" multiple style="display: none;">
+                            <button type="button" id="browse-files-btn" class="btn-secondary">Seleccionar archivos</button>
+                        </div>
+                    </div>
+                    <div id="file-preview-list" class="file-preview-list"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-file-form">Cancelar</button>
+                </div>
+            </form>
+        `;
+    }
+
+    function setupFileFormLogic() {
+        const form = document.getElementById('advanced-file-form');
+        if (!form) return;
+
+        const dropZone = document.getElementById('file-drop-zone');
+        const fileInput = document.getElementById('file-input-hidden');
+        const browseBtn = document.getElementById('browse-files-btn');
+        const previewList = document.getElementById('file-preview-list');
+        let selectedFiles = [];
+
+        browseBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        dropZone.addEventListener('drop', (e) => {
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        function handleFiles(files) {
+            for (const file of files) {
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    selectedFiles.push(file);
+                }
+            }
+            renderFilePreviews();
+        }
+        
+        function renderFilePreviews() {
+            previewList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileEl = document.createElement('div');
+                fileEl.className = 'file-preview-item';
+                fileEl.innerHTML = `<span>${file.name}</span><button type="button" data-index="${index}">&times;</button>`;
+                previewList.appendChild(fileEl);
+            });
+        }
+
+        previewList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                selectedFiles.splice(e.target.dataset.index, 1);
+                renderFilePreviews();
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = form.elements.name.value;
+            const description = form.elements.description.value;
+
+            if (!name) {
+                showMessage('El nombre es obligatorio.', true);
+                return;
+            }
+            if (selectedFiles.length === 0) {
+                showMessage('Debe seleccionar al menos un archivo.', true);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', description);
+            selectedFiles.forEach(file => formData.append('files', file));
+            
+            try {
+                const response = await fetch(`/unidades/${state.currentUnitId}/archivos`, {
+                    method: 'POST',
+                    headers: authHeadersForFiles,
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || 'Error al subir los archivos');
+                }
+                
+                showMessage('Archivo(s) guardado(s) con éxito.');
+                activityFormModal.style.display = 'none';
+                loadUnitContent(state.currentUnitId);
+            } catch (error) {
+                showMessage(error.message, true);
+            }
+        });
+
+        document.getElementById('cancel-file-form').addEventListener('click', () => {
+            activityFormModal.style.display = 'none';
+        });
+    }
+
+    // ... (El resto del código de la aplicación)
+     function initializeHeader(curso) {
         const currentUserEmail = localStorage.getItem('user_email');
         const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
         let username = (userProfileString && JSON.parse(userProfileString).username) || currentUserEmail.split('@')[0];
@@ -129,10 +300,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupEnrollmentForm();
         setupStudentDeletion();
     }
-
+    
     function initializeCourseContentView(curso) {
         unitsListContainer.addEventListener('click', handleUnitListClick);
         renderUnitsSidebar(curso.unidades || []);
+
+        if (curso.unidades && curso.unidades.length > 0) {
+            const firstUnitId = curso.unidades[0]._id;
+            const firstUnitElement = unitsListContainer.querySelector(`[data-unit-id="${firstUnitId}"]`);
+            if (firstUnitElement) {
+                firstUnitElement.classList.add('active');
+                loadUnitContent(firstUnitId);
+            }
+        }
     }
 
     // --- 5. LÓGICA DE UNIDADES (CRUD) ---
@@ -154,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         form.addEventListener('submit', handleUnitFormSubmit);
     }
-
+    
     async function handleUnitFormSubmit(e) {
         e.preventDefault();
         const input = document.getElementById('unit-name-input');
@@ -201,7 +381,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const unitId = unitItem.dataset.unitId;
 
-        // Solo los admins pueden editar o borrar
         if (isAdmin) {
             if (e.target.closest('.btn-edit-unit')) {
                 const unitToEdit = state.curso.unidades.find(u => u._id === unitId);
@@ -230,7 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.querySelectorAll('.unit-item').forEach(item => item.classList.remove('active'));
         unitItem.classList.add('active');
-        loadUnitContent(unitId, state.curso.unidades);
+        loadUnitContent(unitId);
     }
 
     function openUnitModal(unit = null) {
@@ -271,28 +450,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         div.innerHTML = `<span>${unidad.name}</span> ${isAdmin ? adminActions : ''}`;
         return div;
     }
+    async function loadUnitContent(unitId) {
+        const id = unitId || state.currentUnitId;
+        if (!id) return; 
 
-    function loadUnitContent(unitId, unidades) {
-        const unit = unidades.find(u => u._id === unitId);
+        const unit = state.curso.unidades.find(u => u._id === id);
         if (!unit) return;
+
+        state.currentUnitId = id;
     
         unitContentPlaceholder.style.display = 'none';
         unitContentDisplay.style.display = 'block';
         
         document.getElementById('unit-title-display').textContent = unit.name;
-        document.getElementById('lessons-and-activities-container').innerHTML = '<p>Aquí se mostrarán las lecciones y actividades de esta unidad.</p>';
         
         const addContentButtons = document.querySelector('.unit-actions');
         if (addContentButtons) {
             addContentButtons.style.display = isAdmin ? 'flex' : 'none';
         }
-        
-        document.getElementById('add-lesson-btn').onclick = () => showMessage('Añadir Lección', true);
-        document.getElementById('add-activity-btn').onclick = () => showMessage('Añadir Actividad', true);
+
+        lessonsContainer.innerHTML = '<p>Cargando contenido...</p>';
+
+        try {
+            const url = `/unidades/${id}/contenidos`;
+            const response = await fetch(url, { headers: authHeaders, cache: 'no-cache' });
+
+            if (!response.ok) throw new Error('No se pudo cargar el contenido de la unidad.');
+            
+            const data = await response.json();
+            
+            renderUnitDynamicContent(data.archivos, data.lecciones, data.actividades);
+
+        } catch (error) {
+            console.error("Error al cargar contenido de la unidad:", error);
+            lessonsContainer.innerHTML = `<p style="color: red;">Error al cargar el contenido. ${error.message}</p>`;
+        }
     }
 
-    // --- 6. PESTAÑA "PARTICIPANTES" ---
+    function renderUnitDynamicContent(archivos = [], lecciones = [], actividades = []) {
+        lessonsContainer.innerHTML = ''; 
 
+        const hasContent = (archivos && archivos.length > 0) || (lecciones && lecciones.length > 0) || (actividades && actividades.length > 0);
+
+        if (!hasContent) {
+            lessonsContainer.innerHTML = '<p>Aún no hay lecciones ni actividades en esta unidad.</p>';
+            return;
+        }
+
+        if (archivos && archivos.length > 0) {
+            archivos.forEach(archivo => {
+                if (!archivo || !archivo.url) return; 
+                const fileElement = document.createElement('div');
+                fileElement.className = 'resource-item-list';
+                
+                fileElement.innerHTML = `
+                    <a href="${archivo.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                        <i class="fas fa-file-pdf" style="margin-right: 8px; color: #D32F2F;"></i>
+                        <span>${archivo.name}</span>
+                    </a>
+                `;
+                lessonsContainer.appendChild(fileElement);
+            });
+        }
+    }
+    // --- 7. PESTAÑA "PARTICIPANTES" ---
     function renderStudentList(inscritos) {
         const listaEstudiantes = document.getElementById('lista-estudiantes');
         if (!listaEstudiantes) return;
@@ -359,8 +580,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
-
-    // --- UTILIDADES ---
+    
+    // --- 8. UTILIDADES ---
     function showMessage(message, isError = false) {
         const toast = document.createElement('div');
         toast.className = `toast ${isError ? 'toast--error' : ''}`;
