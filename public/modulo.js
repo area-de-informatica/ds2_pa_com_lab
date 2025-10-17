@@ -229,7 +229,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const formData = new FormData();
             formData.append('name', name);
             formData.append('description', description);
-            selectedFiles.forEach(file => formData.append('files', file));
+            // Adjuntar solo el primer archivo con el campo 'file'
+            formData.append('file', selectedFiles[0]); 
             
             try {
                 const response = await fetch(`/unidades/${state.currentUnitId}/archivos`, {
@@ -239,14 +240,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.message || 'Error al subir los archivos');
+                    let errorMessage = `Error del servidor: ${response.status}`;
+                    try {
+                        const errData = await response.json();
+                        errorMessage = errData.message || JSON.stringify(errData);
+                    } catch (e) {
+                        errorMessage = await response.text();
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                showMessage('Archivo(s) guardado(s) con éxito.');
+                showMessage('Archivo guardado con éxito.');
                 activityFormModal.style.display = 'none';
                 loadUnitContent(state.currentUnitId);
             } catch (error) {
+                console.error("Fallo en la subida del archivo:", error);
                 showMessage(error.message, true);
             }
         });

@@ -4,14 +4,31 @@ import { UpdateArchivoDto } from './dto/update-archivo.dto';
 import { Archivo } from './schemas/archivos.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ArchivoSchema } from './schemas/archivos.schema';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ArchivosService {
   constructor(@InjectModel(Archivo.name) private archivoModel: Model<Archivo>) {}
 
-  async create(createArchivoDto: CreateArchivoDto): Promise<Archivo> {
-    const createdArchivo = new this.archivoModel(createArchivoDto);
+  async create(createArchivoDto: CreateArchivoDto, file: Express.Multer.File): Promise<Archivo> {
+    const uploadPath = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    const filePath = path.join(uploadPath, file.originalname);
+    fs.writeFileSync(filePath, file.buffer);
+
+    const fileUrl = `/uploads/${file.originalname}`;
+
+    const createdArchivo = new this.archivoModel({
+      name: createArchivoDto.name,
+      title: createArchivoDto.description,
+      route: fileUrl,
+      format: file.mimetype,
+      size: file.size.toString(),
+      extent: path.extname(file.originalname),
+    });
     return createdArchivo.save();
   }
 
@@ -41,5 +58,5 @@ export class ArchivosService {
 
   async remove(id: string): Promise<Archivo | null> {
     return this.archivoModel.findByIdAndDelete(id).exec()
-}
+  }
 }

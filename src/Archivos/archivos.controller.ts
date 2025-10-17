@@ -1,15 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ArchivosService } from './archivos.service';
 import { CreateArchivoDto } from './dto/create-archivo.dto';
 import { UpdateArchivoDto } from './dto/update-archivo.dto';
 
-@Controller('archivos')
+@Controller('unidades/:idUnidad/archivos')
 export class ArchivosController {
   constructor(private readonly archivosService: ArchivosService) {}
 
   @Post()
-  create(@Body() createArchivoDto: CreateArchivoDto) {
-    return this.archivosService.create(createArchivoDto);
+  @UseInterceptors(FileInterceptor('file'))
+  create(@UploadedFile() file: Express.Multer.File, @Body() createArchivoDto: CreateArchivoDto) {
+    if (!file) {
+      throw new BadRequestException('No se ha incluido ningún archivo en la solicitud.');
+    }
+    return this.archivosService.create(createArchivoDto, file);
   }
 
   @Get()

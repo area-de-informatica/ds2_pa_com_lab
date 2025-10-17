@@ -26,6 +26,11 @@ import { DatabaseModule } from './database/database.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
 
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
+
     DatabaseModule, // <-- MÓDULO DE BASE DE DATOS CENTRALIZADO
 
     AuthModule,
