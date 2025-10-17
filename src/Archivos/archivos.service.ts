@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArchivoDto } from './dto/create-archivo.dto';
 import { UpdateArchivoDto } from './dto/update-archivo.dto';
 import { Archivo } from './schemas/archivos.schema';
+import { Contenidos } from '../Contenidos/schemas/contenidos.schema';
+import { Unidades } from '../Unidades/schemas/unidades.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
@@ -9,9 +11,13 @@ import * as path from 'path';
 
 @Injectable()
 export class ArchivosService {
-  constructor(@InjectModel(Archivo.name) private archivoModel: Model<Archivo>) {}
+  constructor(
+    @InjectModel(Archivo.name) private archivoModel: Model<Archivo>,
+    @InjectModel(Contenidos.name) private contenidoModel: Model<Contenidos>,
+    @InjectModel(Unidades.name) private unidadModel: Model<Unidades>,
+  ) {}
 
-  async create(createArchivoDto: CreateArchivoDto, file: Express.Multer.File): Promise<Archivo> {
+  async create(idUnidad: string, createArchivoDto: CreateArchivoDto, file: Express.Multer.File): Promise<Archivo> {
     const uploadPath = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
@@ -29,7 +35,24 @@ export class ArchivosService {
       size: file.size.toString(),
       extent: path.extname(file.originalname),
     });
-    return createdArchivo.save();
+    const savedArchivo = await createdArchivo.save();
+
+    const newContenido = new this.contenidoModel({
+      title: savedArchivo.name, 
+      description: createArchivoDto.description,
+      archivo: savedArchivo._id, 
+      unidad: idUnidad,
+    });
+    const savedContenido = await newContenido.save();
+
+    const unidad = await this.unidadModel.findById(idUnidad);
+    if (!unidad) {
+      throw new NotFoundException(`No se encontró la unidad con el id ${idUnidad}`);
+    }
+    unidad.Contenidos.push(savedContenido.id);
+    await unidad.save();
+
+    return savedArchivo;
   }
 
   async findAll(): Promise<Archivo[]> {

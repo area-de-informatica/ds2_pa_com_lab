@@ -13,6 +13,9 @@
     # pkgs.nodePackages.nodemon
   ];
 
+  # Enable the MongoDB service
+  services.mongodb.enable = true;
+
   # Sets environment variables in the workspace
   env = {};
   idx = {

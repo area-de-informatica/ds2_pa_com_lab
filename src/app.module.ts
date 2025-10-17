@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,16 +21,18 @@ import { DatabaseModule } from './database/database.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-    }),
-
+    // 1. Servir archivos de la carpeta 'uploads' en la ruta /uploads
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
 
-    DatabaseModule, // <-- MÓDULO DE BASE DE DATOS CENTRALIZADO
+    // 2. Servir la aplicación principal de frontend
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+
+    DatabaseModule,
 
     AuthModule,
     UsuariosModule,

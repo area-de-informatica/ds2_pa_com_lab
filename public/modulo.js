@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         lessonsContainer.innerHTML = '<p>Cargando contenido...</p>';
 
         try {
-            const url = `/unidades/${id}/contenidos`;
+            const url = `/unidades/${id}/Contenidos`;
             const response = await fetch(url, { headers: authHeaders, cache: 'no-cache' });
 
             if (!response.ok) throw new Error('No se pudo cargar el contenido de la unidad.');

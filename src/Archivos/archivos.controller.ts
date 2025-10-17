@@ -10,11 +10,11 @@ export class ArchivosController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  create(@UploadedFile() file: Express.Multer.File, @Body() createArchivoDto: CreateArchivoDto) {
+  create(@Param('idUnidad') idUnidad: string, @UploadedFile() file: Express.Multer.File, @Body() createArchivoDto: CreateArchivoDto) {
     if (!file) {
       throw new BadRequestException('No se ha incluido ningún archivo en la solicitud.');
     }
-    return this.archivosService.create(createArchivoDto, file);
+    return this.archivosService.create(idUnidad, createArchivoDto, file);
   }
 
   @Get()

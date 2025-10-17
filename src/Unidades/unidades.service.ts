@@ -5,6 +5,7 @@ import { UpdateUnidadesDto } from './dto/update-unidade.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Unidades } from './schemas/unidades.schema';
+import { Contenidos } from '../Contenidos/schemas/contenidos.schema';
 
 @Injectable()
 export class UnidadesService {
@@ -12,8 +13,6 @@ export class UnidadesService {
     @InjectModel(Unidades.name) private unidadeModel: Model<Unidades>,
   ) {}
 
-  // El método create ahora es mucho más simple. 
-  // Solo se encarga de crear el documento de la unidad.
   async create(createUnidadeDto: CreateUnidadesDto): Promise<Unidades> {
     const createdUnidade = new this.unidadeModel(createUnidadeDto);
     return createdUnidade.save();
@@ -27,8 +26,33 @@ export class UnidadesService {
     return this.unidadeModel.findById(id).populate('Contenidos').populate('Lecciones').exec();
   }
 
-  async findUnidadesContenido(Id: string): Promise<Unidades | null> {
-    return this.unidadeModel.findById(Id).populate('Contenidos').exec();
+  async findUnidadesContenido(id: string): Promise<any> {
+    const unidad = await this.unidadeModel.findById(id)
+      .populate({
+        path: 'Contenidos',
+        populate: {
+          path: 'archivo',
+          model: 'Archivo'
+        }
+      })
+      .populate('Lecciones')
+      .exec();
+
+    if (!unidad) {
+      throw new NotFoundException(`Unidad con ID "${id}" no encontrada`);
+    }
+
+    const archivos = unidad.Contenidos.filter(c => c.archivo).map((c: any) => ({
+      _id: c.archivo._id,
+      name: c.archivo.name,
+      url: c.archivo.route,
+      description: c.description,
+    }));
+
+    const lecciones = unidad.Lecciones; // Se pueden mapear de forma similar si es necesario
+    const actividades = []; // Placeholder para futuras actividades
+
+    return { archivos, lecciones, actividades };
   }
 
   async findUnidadesLecciones(Id: string): Promise<Unidades | null> {
