@@ -1,6 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Módulo.js v26 - Eliminando TinyMCE");
+    console.log("Módulo.js v27 - Funcionalidad de Borrado Añadida");
 
     // --- 1. ESTADO CENTRAL Y AUTENTICACIÓN ---
     let state = {
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         editMode: false,
         currentUnitId: null
     };
-    // ... (código de autenticación existente) ...
+    
     function decodeJwt(token) {
         try {
             const base64Url = token.split('.')[1];
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return JSON.parse(jsonPayload);
         } catch (e) { return null; }
     }
+
     const token = localStorage.getItem('access_token');
     const decodedToken = decodeJwt(token);
     if (!token || !decodedToken) {
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.replace('index.html');
         return;
     }
+
     const userRole = decodedToken.role;
     const userId = decodedToken.sub;
     const isAdmin = userRole === 'admin';
@@ -49,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const activityFormContainer = document.getElementById('activity-form-container');
 
     // --- 3. INICIALIZACIÓN PRINCIPAL ---
-    // ... (código de inicialización existente) ...
     if (!cursoId) {
         mainContent.innerHTML = '<h1>Error: No se ha especificado un curso.</h1><a href="main.html" class="btn">Volver</a>';
         return;
@@ -229,11 +230,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const formData = new FormData();
             formData.append('name', name);
             formData.append('description', description);
-            // Adjuntar solo el primer archivo con el campo 'file'
             formData.append('file', selectedFiles[0]); 
             
             try {
-                const response = await fetch(`/unidades/${state.currentUnitId}/archivos`, {
+                // USA LA NUEVA RUTA DEL CONTROLADOR
+                const response = await fetch(`/archivos/unidades/${state.currentUnitId}`, {
                     method: 'POST',
                     headers: authHeadersForFiles,
                     body: formData,
@@ -241,12 +242,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (!response.ok) {
                     let errorMessage = `Error del servidor: ${response.status}`;
-                    try {
-                        const errData = await response.json();
-                        errorMessage = errData.message || JSON.stringify(errData);
-                    } catch (e) {
-                        errorMessage = await response.text();
-                    }
+                    const errData = await response.json().catch(() => null);
+                    errorMessage = errData ? (errData.message || JSON.stringify(errData)) : await response.text();
                     throw new Error(errorMessage);
                 }
                 
@@ -264,7 +261,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // ... (El resto del código de la aplicación)
      function initializeHeader(curso) {
         const currentUserEmail = localStorage.getItem('user_email');
         const userProfileString = localStorage.getItem(`profile_${currentUserEmail}`);
@@ -311,6 +307,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     function initializeCourseContentView(curso) {
         unitsListContainer.addEventListener('click', handleUnitListClick);
+        // NUEVO: Listener para manejar clics de borrado en los recursos
+        lessonsContainer.addEventListener('click', handleDeleteResourceClick);
         renderUnitsSidebar(curso.unidades || []);
 
         if (curso.unidades && curso.unidades.length > 0) {
@@ -397,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (e.target.closest('.btn-delete-unit')) {
-                if (confirm('¿Estás seguro de que quieres eliminar esta sección?')) {
+                if (confirm('¿Estás seguro de que quieres eliminar esta sección? Esto eliminará todo su contenido.')) {
                     try {
                         const response = await fetch(`/cursos/${cursoId}/unidades/${unitId}`, { method: 'DELETE', headers: authHeaders });
                         if (!response.ok) throw new Error((await response.json()).message || 'Error al eliminar');
@@ -458,6 +456,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         div.innerHTML = `<span>${unidad.name}</span> ${isAdmin ? adminActions : ''}`;
         return div;
     }
+    
     async function loadUnitContent(unitId) {
         const id = unitId || state.currentUnitId;
         if (!id) return; 
@@ -495,6 +494,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- NUEVA FUNCIÓN PARA GESTIONAR EL BORRADO DE RECURSOS ---
+    async function handleDeleteResourceClick(e) {
+        const deleteButton = e.target.closest('.btn-delete-resource');
+        if (!deleteButton || !isAdmin) return;
+
+        const resourceElement = deleteButton.closest('.resource-item-list');
+        const archivoId = deleteButton.dataset.archivoId;
+
+        if (confirm('¿Estás seguro de que quieres eliminar este archivo? Esta acción no se puede deshacer.')) {
+            try {
+                const response = await fetch(`/archivos/${archivoId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders,
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Error al eliminar el archivo.');
+                }
+                
+                // Eliminar el elemento del DOM
+                resourceElement.style.transition = 'opacity 0.3s ease';
+                resourceElement.style.opacity = '0';
+                setTimeout(() => resourceElement.remove(), 300);
+
+                showMessage('Archivo eliminado con éxito.');
+
+            } catch (error) {
+                console.error("Error al eliminar archivo:", error);
+                showMessage(error.message, true);
+            }
+        }
+    }
+
+    // --- FUNCIÓN DE RENDERIZADO MODIFICADA ---
     function renderUnitDynamicContent(archivos = [], lecciones = [], actividades = []) {
         lessonsContainer.innerHTML = ''; 
 
@@ -511,16 +546,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const fileElement = document.createElement('div');
                 fileElement.className = 'resource-item-list';
                 
+                // Definir las acciones de administrador (botón de borrado)
+                const adminActions = isAdmin ? `
+                    <div class="resource-item-actions">
+                        <button class="btn-delete-resource" data-archivo-id="${archivo._id}" title="Eliminar Archivo"><i class="fas fa-trash"></i></button>
+                    </div>
+                ` : '';
+                
+                // Estructura del elemento de archivo
                 fileElement.innerHTML = `
-                    <a href="${archivo.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
-                        <i class="fas fa-file-pdf" style="margin-right: 8px; color: #D32F2F;"></i>
-                        <span>${archivo.name}</span>
-                    </a>
+                    <div class="resource-item-content">
+                        <a href="${archivo.url}" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-file-pdf resource-icon"></i>
+                            <span>${archivo.name}</span>
+                        </a>
+                    </div>
+                    ${adminActions}
                 `;
                 lessonsContainer.appendChild(fileElement);
             });
         }
     }
+
     // --- 7. PESTAÑA "PARTICIPANTES" ---
     function renderStudentList(inscritos) {
         const listaEstudiantes = document.getElementById('lista-estudiantes');

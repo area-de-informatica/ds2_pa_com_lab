@@ -79,7 +79,41 @@ export class ArchivosService {
     return this.archivoModel.findByIdAndUpdate(id, updateArchivoDto, { new: true }).exec();
   }
 
-  async remove(id: string): Promise<Archivo | null> {
-    return this.archivoModel.findByIdAndDelete(id).exec()
+  async remove(id: string): Promise<any> {
+    // 1. Find the Archivo document
+    const archivo = await this.archivoModel.findById(id);
+    if (!archivo) {
+      throw new NotFoundException(`Archivo con ID "${id}" no encontrado.`);
+    }
+
+    // 2. Delete the physical file
+    const filePath = path.join(process.cwd(), archivo.route);
+    try {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (err) {
+      console.error(`Error al eliminar el archivo físico ${filePath}:`, err);
+      // Decide if you want to stop the process or just log the error
+    }
+
+    // 3. Find and delete the associated Contenido document
+    const contenido = await this.contenidoModel.findOneAndDelete({ archivo: id });
+
+    // 4. If a Contenido was found, remove its reference from the Unidad
+    if (contenido) {
+      await this.unidadModel.findByIdAndUpdate(contenido.unidad, {
+        $pull: { Contenidos: contenido._id },
+      });
+    }
+
+    // 5. Delete the Archivo document itself
+    await this.archivoModel.findByIdAndDelete(id);
+
+    return {
+      message: 'Archivo eliminado exitosamente.',
+      deletedArchivoId: id,
+      deletedContenidoId: contenido ? contenido._id : null,
+    };
   }
 }

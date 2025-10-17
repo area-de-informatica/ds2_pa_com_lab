@@ -16,10 +16,20 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { DatabaseModule } from './database/database.module';
+import * as Joi from 'joi'; // Importamos Joi
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    // Hacemos que la configuración sea más robusta con validación
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().required(), // La aplicación no arrancará si esta variable no existe
+      }),
+      validationOptions: {
+        abortEarly: true, // Detiene la validación en el primer error
+      },
+    }),
 
     // 1. Servir archivos de la carpeta 'uploads' en la ruta /uploads
     ServeStaticModule.forRoot({

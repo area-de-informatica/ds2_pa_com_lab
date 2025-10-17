@@ -4,11 +4,12 @@ import { ArchivosService } from './archivos.service';
 import { CreateArchivoDto } from './dto/create-archivo.dto';
 import { UpdateArchivoDto } from './dto/update-archivo.dto';
 
-@Controller('unidades/:idUnidad/archivos')
+@Controller('archivos') // RUTA SIMPLIFICADA
 export class ArchivosController {
   constructor(private readonly archivosService: ArchivosService) {}
 
-  @Post()
+  // La ruta de creación ahora es POST /archivos/unidades/:idUnidad
+  @Post('unidades/:idUnidad') 
   @UseInterceptors(FileInterceptor('file'))
   create(@Param('idUnidad') idUnidad: string, @UploadedFile() file: Express.Multer.File, @Body() createArchivoDto: CreateArchivoDto) {
     if (!file) {
@@ -32,6 +33,7 @@ export class ArchivosController {
     return this.archivosService.update(id, updateArchivoDto);
   }
 
+  // La ruta de borrado ahora es DELETE /archivos/:id
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.archivosService.remove(id);

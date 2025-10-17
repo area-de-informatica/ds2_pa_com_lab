@@ -18,11 +18,12 @@ const MODELS = [
 @Global()
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    // Ya no es necesario ConfigModule.forRoot() aquí, es global desde app.module
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule], // Importamos ConfigModule para poder inyectar ConfigService
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
+        // Corregimos el nombre de la variable de entorno
+        uri: configService.get<string>('DATABASE_URL'), 
       }),
       inject: [ConfigService],
     }),
