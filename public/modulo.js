@@ -1,6 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Módulo.js v27 - Funcionalidad de Borrado Añadida");
+    console.log("Módulo.js v28 - Funcionalidad de Edición de Recursos (Preliminar)");
 
     // --- 1. ESTADO CENTRAL Y AUTENTICACIÓN ---
     let state = {
@@ -233,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             formData.append('file', selectedFiles[0]); 
             
             try {
-                // USA LA NUEVA RUTA DEL CONTROLADOR
                 const response = await fetch(`/archivos/unidades/${state.currentUnitId}`, {
                     method: 'POST',
                     headers: authHeadersForFiles,
@@ -307,8 +306,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     function initializeCourseContentView(curso) {
         unitsListContainer.addEventListener('click', handleUnitListClick);
-        // NUEVO: Listener para manejar clics de borrado en los recursos
-        lessonsContainer.addEventListener('click', handleDeleteResourceClick);
+        // CONECTAMOS EL NUEVO MANEJADOR DE ACCIONES
+        lessonsContainer.addEventListener('click', handleResourceActionClick);
         renderUnitsSidebar(curso.unidades || []);
 
         if (curso.unidades && curso.unidades.length > 0) {
@@ -494,78 +493,132 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- NUEVA FUNCIÓN PARA GESTIONAR EL BORRADO DE RECURSOS ---
-    async function handleDeleteResourceClick(e) {
+    // --- NUEVA FUNCIÓN UNIFICADA PARA ACCIONES DE RECURSOS ---
+    async function handleResourceActionClick(e) {
+        if (!isAdmin) return;
+
+        const editButton = e.target.closest('.btn-edit-resource');
         const deleteButton = e.target.closest('.btn-delete-resource');
-        if (!deleteButton || !isAdmin) return;
 
-        const resourceElement = deleteButton.closest('.resource-item-list');
-        const archivoId = deleteButton.dataset.archivoId;
+        // Lógica para el botón de EDITAR
+        if (editButton) {
+            const resourceElement = editButton.closest('.resource-item-list');
+            const resourceId = resourceElement.dataset.resourceId;
+            const resourceType = resourceElement.dataset.resourceType;
+            
+            alert(`¡El botón de editar ahora funciona! 
+ID: ${resourceId}
+Tipo: ${resourceType}`);
+            // Próximamente: openActivityModal(resourceType, resourceId);
+            return;
+        }
 
-        if (confirm('¿Estás seguro de que quieres eliminar este archivo? Esta acción no se puede deshacer.')) {
-            try {
-                const response = await fetch(`/archivos/${archivoId}`, {
-                    method: 'DELETE',
-                    headers: authHeaders,
-                });
+        // Lógica para el botón de BORRAR
+        if (deleteButton) {
+            const resourceElement = deleteButton.closest('.resource-item-list');
+            const archivoId = deleteButton.dataset.archivoId;
 
-                const result = await response.json();
+            if (confirm('¿Estás seguro de que quieres eliminar este recurso? Esta acción no se puede deshacer.')) {
+                try {
+                    // Nota: Esta ruta debería ser genérica para cualquier tipo de recurso, no solo archivos.
+                    // Esto se mejorará en el futuro.
+                    const response = await fetch(`/archivos/${archivoId}`, {
+                        method: 'DELETE',
+                        headers: authHeaders,
+                    });
 
-                if (!response.ok) {
-                    throw new Error(result.message || 'Error al eliminar el archivo.');
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Error al eliminar el recurso.');
+                    }
+                    
+                    resourceElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    resourceElement.style.opacity = '0';
+                    resourceElement.style.transform = 'translateX(20px)';
+                    setTimeout(() => resourceElement.remove(), 300);
+
+                    showMessage('Recurso eliminado con éxito.');
+
+                } catch (error) {
+                    console.error("Error al eliminar el recurso:", error);
+                    showMessage(error.message, true);
                 }
-                
-                // Eliminar el elemento del DOM
-                resourceElement.style.transition = 'opacity 0.3s ease';
-                resourceElement.style.opacity = '0';
-                setTimeout(() => resourceElement.remove(), 300);
-
-                showMessage('Archivo eliminado con éxito.');
-
-            } catch (error) {
-                console.error("Error al eliminar archivo:", error);
-                showMessage(error.message, true);
             }
         }
     }
 
-    // --- FUNCIÓN DE RENDERIZADO MODIFICADA ---
+    // --- FUNCIÓN DE RENDERIZADO DE CONTENIDO (Sin cambios) ---
+    function getResourceIcon(archivo) {
+        const nameForExtension = archivo.originalName || archivo.url || '';
+        const fileExtension = nameForExtension.split('.').pop().toLowerCase();
+        let iconClass = 'fas fa-file';
+        let iconColor = '#6c757d';
+
+        switch (fileExtension) {
+            case 'pdf': iconClass = 'fas fa-file-pdf'; iconColor = '#e63946'; break;
+            case 'doc': case 'docx': iconClass = 'fas fa-file-word'; iconColor = '#007bff'; break;
+            case 'xls': case 'xlsx': iconClass = 'fas fa-file-excel'; iconColor = '#28a745'; break;
+            case 'ppt': case 'pptx': iconClass = 'fas fa-file-powerpoint'; iconColor = '#fd7e14'; break;
+            case 'jpg': case 'jpeg': case 'png': case 'gif': iconClass = 'fas fa-file-image'; iconColor = '#17a2b8'; break;
+            case 'zip': case 'rar': iconClass = 'fas fa-file-archive'; iconColor = '#343a40'; break;
+        }
+        return `<i class="${iconClass} resource-icon" style="color: ${iconColor};"></i>`;
+    }
+
     function renderUnitDynamicContent(archivos = [], lecciones = [], actividades = []) {
         lessonsContainer.innerHTML = ''; 
 
-        const hasContent = (archivos && archivos.length > 0) || (lecciones && lecciones.length > 0) || (actividades && actividades.length > 0);
+        const allResources = [
+            ...(archivos || []).map(a => ({ ...a, type: 'archivo' })),
+            ...(lecciones || []).map(l => ({ ...l, type: 'leccion' })),
+            ...(actividades || []).map(act => ({ ...act, type: 'actividad' }))
+        ];
 
-        if (!hasContent) {
-            lessonsContainer.innerHTML = '<p>Aún no hay lecciones ni actividades en esta unidad.</p>';
+        if (allResources.length === 0) {
+            lessonsContainer.innerHTML = '<p class="empty-list-message">Aún no hay lecciones ni actividades en esta unidad.</p>';
             return;
         }
 
-        if (archivos && archivos.length > 0) {
-            archivos.forEach(archivo => {
-                if (!archivo || !archivo.url) return; 
-                const fileElement = document.createElement('div');
-                fileElement.className = 'resource-item-list';
-                
-                // Definir las acciones de administrador (botón de borrado)
-                const adminActions = isAdmin ? `
-                    <div class="resource-item-actions">
-                        <button class="btn-delete-resource" data-archivo-id="${archivo._id}" title="Eliminar Archivo"><i class="fas fa-trash"></i></button>
-                    </div>
-                ` : '';
-                
-                // Estructura del elemento de archivo
-                fileElement.innerHTML = `
-                    <div class="resource-item-content">
-                        <a href="${archivo.url}" target="_blank" rel="noopener noreferrer">
-                            <i class="fas fa-file-pdf resource-icon"></i>
-                            <span>${archivo.name}</span>
-                        </a>
-                    </div>
-                    ${adminActions}
-                `;
-                lessonsContainer.appendChild(fileElement);
-            });
-        }
+        allResources.forEach(resource => {
+            const resourceElement = document.createElement('div');
+            resourceElement.className = 'resource-item-list';
+            resourceElement.dataset.resourceId = resource._id;
+            resourceElement.dataset.resourceType = resource.type;
+
+            let iconHTML = '';
+            let resourceLink = '#';
+            let resourceName = resource.name || 'Recurso sin nombre';
+
+            if (resource.type === 'archivo') {
+                iconHTML = getResourceIcon(resource);
+                resourceLink = resource.url;
+            } else if (resource.type === 'leccion') {
+                iconHTML = '<i class="fas fa-file-alt resource-icon" style="color: #6f42c1;"></i>';
+            } else if (resource.type === 'actividad') {
+                iconHTML = '<i class="fas fa-comments resource-icon" style="color: #ffc107;"></i>';
+            }
+
+            const adminActions = isAdmin ? `
+                <div class="resource-item-actions">
+                    <button class="btn-edit-resource" title="Editar Ajustes"><i class="fas fa-pen"></i></button>
+                    <button class="btn-delete-resource" data-archivo-id="${resource._id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </div>
+            ` : '';
+
+            const dragHandle = isAdmin ? '<i class="fas fa-arrows-alt-v drag-handle" title="Mover"></i>' : '';
+
+            resourceElement.innerHTML = `
+                ${dragHandle}
+                <div class="resource-item-content">
+                    <a href="${resourceLink}" target="_blank" rel="noopener noreferrer">
+                        ${iconHTML}
+                        <span>${resourceName}</span>
+                    </a>
+                </div>
+                ${adminActions}
+            `;
+            lessonsContainer.appendChild(resourceElement);
+        });
     }
 
     // --- 7. PESTAÑA "PARTICIPANTES" ---

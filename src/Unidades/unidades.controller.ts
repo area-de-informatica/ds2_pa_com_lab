@@ -8,12 +8,12 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles(Role.ADMIN)
 @Controller('unidades')
 export class UnidadesController {
   constructor(private readonly unidadesService: UnidadesService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body() createUnidadeDto: CreateUnidadesDto) {
     return this.unidadesService.create(createUnidadeDto);
   }
@@ -29,11 +29,13 @@ export class UnidadesController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   update(@Param('id') id: string, @Body() updateUnidadeDto: UpdateUnidadesDto) {
     return this.unidadesService.update(id, updateUnidadeDto);
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string) {
     return this.unidadesService.remove(id);
   }

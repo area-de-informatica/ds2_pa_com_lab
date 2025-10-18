@@ -61,10 +61,15 @@ export class CursosService {
 
   async findAll(): Promise<Curso[]> {
     return this.cursoModel.find()
-      .populate('inscritos') // <-- PARCHE ELIMINADO Y CÓDIGO RESTAURADO
+      .populate('inscritos')
       .populate({
         path: 'unidades',
-        populate: { path: 'Lecciones' } 
+        populate: {
+          path: 'Lecciones',
+          populate: {
+            path: 'Archivos'
+          }
+        }
       })
       .exec();
   }
@@ -74,7 +79,12 @@ export class CursosService {
       .populate('inscritos')
       .populate({
         path: 'unidades',
-        populate: { path: 'Lecciones' } 
+        populate: {
+          path: 'Lecciones',
+          populate: {
+            path: 'Archivos'
+          }
+        }
       })
       .exec();
   }
@@ -115,12 +125,12 @@ export class CursosService {
   async eliminarEstudiante(cursoId: string, usuarioId: string): Promise<Curso> {
     const curso = await this.cursoModel.findById(cursoId);
     if (!curso) {
-        throw new NotFoundException(`Curso con ID "${cursoId}" no encontrado`);
+        throw new NotFoundException(`Curso con ID \"${cursoId}\" no encontrado`);
     }
 
     const usuario = await this.usuarioModel.findById(usuarioId);
     if (!usuario) {
-        throw new NotFoundException(`Usuario con ID "${usuarioId}" no encontrado`);
+        throw new NotFoundException(`Usuario con ID \"${usuarioId}\" no encontrado`);
     }
 
     await this.usuarioModel.findByIdAndUpdate(
